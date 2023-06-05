@@ -1,3 +1,4 @@
+import { useState, useRef, ChangeEvent } from "react";
 import {
   Container,
   LeftBox,
@@ -9,6 +10,7 @@ import {
   CardRight,
   DivDespesas,
   DivAcoes,
+  DivSwitch,
 } from "./styles";
 import {
   Menu,
@@ -27,7 +29,18 @@ import {
   Th,
   Td,
   Tr,
+  FormControl,
+  Input,
+  Switch,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalCloseButton,
+  ModalOverlay,
   useMediaQuery,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { SiStarlingbank } from "react-icons/si";
 import {
@@ -42,9 +55,90 @@ import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const initialRef = useRef(null);
+  const finalRef = useRef(null);
+
+  const [value, setValue] = useState("");
+
+  const formatCurrency = (value: string) => {
+    const numericValue = parseInt(value.replace(/\D/g, ""));
+    const formattedValue = (numericValue / 100).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+
+    return formattedValue;
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setValue(formatCurrency(inputValue));
+  };
+
+  const renderNewExpense = () => {
+    return (
+      <Modal
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Nova Despesa</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl id="currency" mb="2rem">
+              <Input
+                variant="flushed"
+                type="text"
+                value={value}
+                onChange={handleChange}
+                placeholder="R$ 0,00"
+                _placeholder={{ color: "#f00" }}
+                fontSize="1.5rem"
+                color="#f00"
+              />
+            </FormControl>
+
+            <Input
+              variant="flushed"
+              type="text"
+              placeholder="Descrição"
+              maxLength={500}
+            />
+
+            <DivSwitch>
+              <div className="div-switch-icon">
+                <Icon
+                  cursor="pointer"
+                  as={FiCheckCircle}
+                  w="1rem"
+                  h="1rem"
+                  mr="1rem"
+                />
+                <Text fontSize="1rem">Não foi paga</Text>
+              </div>
+              <Switch colorScheme="red" />
+            </DivSwitch>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3}>
+              Salvar
+            </Button>
+            <Button onClick={onClose}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
 
   return (
     <>
+      {renderNewExpense()}
       <Container>
         <LeftBox>
           <img className="logo" alt="logo" src={logo} loading="lazy" />
@@ -61,7 +155,7 @@ export default function Dashboard() {
                 Novo
               </MenuButton>
               <MenuList>
-                <MenuItem>
+                <MenuItem onClick={onOpen}>
                   <Icon
                     as={BsFillArrowDownCircleFill}
                     w="1rem"
@@ -164,7 +258,7 @@ export default function Dashboard() {
                   Novo
                 </MenuButton>
                 <MenuList>
-                  <MenuItem>
+                  <MenuItem onClick={onOpen}>
                     <Icon
                       as={BsFillArrowDownCircleFill}
                       w="1rem"

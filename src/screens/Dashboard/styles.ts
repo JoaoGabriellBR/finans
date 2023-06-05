@@ -118,3 +118,19 @@ export const DivAcoes = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+
+export const DivSwitch = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+
+  .div-switch-icon {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+`;
