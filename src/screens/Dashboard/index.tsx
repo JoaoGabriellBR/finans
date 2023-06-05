@@ -8,7 +8,7 @@ import {
   CardLeft,
   CardRight,
   DivDespesas,
-  DivAcoes
+  DivAcoes,
 } from "./styles";
 import {
   Menu,
@@ -22,13 +22,12 @@ import {
   Button,
   TableContainer,
   Table,
-  TableCaption,
   Thead,
   Tbody,
-  Tfoot,
   Th,
   Td,
   Tr,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { SiStarlingbank } from "react-icons/si";
 import {
@@ -38,40 +37,107 @@ import {
 import logo from "../../assets/logo.png";
 import { IoIosAdd } from "react-icons/io";
 import { FiCheckCircle, FiEdit } from "react-icons/fi";
-import { AiOutlineDelete } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineUser } from "react-icons/ai";
+import { RxExit } from "react-icons/rx";
 
 export default function Dashboard() {
+  const [isMobile] = useMediaQuery("(max-width: 1024px)");
+
   return (
     <>
       <Container>
         <LeftBox>
           <img className="logo" alt="logo" src={logo} loading="lazy" />
-          <Button
-            leftIcon={<Icon as={IoIosAdd} w="2rem" h="2rem" color="#FFFFFF" />}
-            mt="2rem"
-            width="80%"
-            borderRadius="2rem"
-            colorScheme="blue"
-            variant="solid"
-          >
-            Novo
-          </Button>
-        </LeftBox>
 
-        <RightBox>
-          <Header>
-            <Text fontSize="1.5rem">Dashboard</Text>
+          {!isMobile && (
+            <Button
+              leftIcon={
+                <Icon as={IoIosAdd} w="2rem" h="2rem" color="#FFFFFF" />
+              }
+              mt="2rem"
+              width="80%"
+              borderRadius="2rem"
+              colorScheme="blue"
+              variant="solid"
+            >
+              Novo
+            </Button>
+          )}
+
+          {isMobile && (
             <Menu>
               <MenuButton>
                 <Avatar w={10} h={10} bg="#3182CE" />
               </MenuButton>
               <Portal>
                 <MenuList>
-                  <MenuItem>Meu Perfil</MenuItem>
-                  <MenuItem>Sair</MenuItem>
+                  <MenuItem>
+                    <Icon
+                      as={AiOutlineUser}
+                      w="1rem"
+                      h="1rem"
+                      color="#3182CE"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Meu Perfil
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem>
+                    <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Sair
+                    </Text>
+                  </MenuItem>
                 </MenuList>
               </Portal>
             </Menu>
+          )}
+        </LeftBox>
+
+        <RightBox>
+          <Header>
+            <Text fontSize="1.5rem">Dashboard</Text>
+            {!isMobile ? (
+              <Menu>
+                <MenuButton>
+                  <Avatar w={10} h={10} bg="#3182CE" />
+                </MenuButton>
+                <Portal>
+                  <MenuList>
+                    <MenuItem>
+                      <Icon
+                        as={AiOutlineUser}
+                        w="1rem"
+                        h="1rem"
+                        color="#3182CE"
+                      />
+                      <Text ml="0.5rem" fontSize="1rem">
+                        Meu Perfil
+                      </Text>
+                    </MenuItem>
+
+                    <MenuItem>
+                      <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
+                      <Text ml="0.5rem" fontSize="1rem">
+                        Sair
+                      </Text>
+                    </MenuItem>
+                  </MenuList>
+                </Portal>
+              </Menu>
+            ) : (
+              <Button
+                leftIcon={
+                  <Icon as={IoIosAdd} w="2rem" h="2rem" color="#FFFFFF" />
+                }
+                borderRadius="2rem"
+                colorScheme="blue"
+                variant="solid"
+              >
+                Novo
+              </Button>
+            )}
           </Header>
 
           <DivCards>
@@ -133,16 +199,22 @@ export default function Dashboard() {
           <Text fontSize="1.5rem">Despesas</Text>
 
           <DivDespesas>
-            <h1>Junho de 2023</h1>
+            <Text fontSize="1rem" mb="2rem">
+              Junho de 2023
+            </Text>
 
             <TableContainer width="100%">
               <Table variant="simple">
                 <Thead>
                   <Tr>
                     <Th width="20%">Situação</Th>
-                    <Th width="20%" isNumeric>Data</Th>
+                    <Th width="20%" isNumeric>
+                      Data
+                    </Th>
                     <Th width="30%">Descrição</Th>
-                    <Th width="5%" isNumeric>Valor</Th>
+                    <Th width="5%" isNumeric>
+                      Valor
+                    </Th>
                     <Th width="15%">Ações</Th>
                   </Tr>
                 </Thead>
@@ -152,7 +224,7 @@ export default function Dashboard() {
                     <Td>Pendente</Td>
                     <Td isNumeric>04/06/2023</Td>
                     <Td>Algar telecom</Td>
-                    <Td>R$ 31,03</Td>
+                    <Td color="#f00">R$ 31,03</Td>
                     <Td>
                       <DivAcoes>
                         <Icon

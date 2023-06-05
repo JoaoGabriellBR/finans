@@ -10,6 +10,13 @@ export const Container = styled.div`
   grid-template-areas:
     "leftbox rightbox rightbox rightbox rightbox"
     "leftbox rightbox rightbox rightbox rightbox";
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "leftbox leftbox"
+      "rightbox rightbox";
+  }
 `;
 
 export const LeftBox = styled.div`
@@ -22,6 +29,11 @@ export const LeftBox = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+
+  @media (max-width: 1024px){
+    flex-direction: row;
+    justify-content: space-between;
+  }
 
   .logo {
     width: 7.5rem;
