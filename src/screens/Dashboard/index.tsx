@@ -39,6 +39,7 @@ import { IoIosAdd } from "react-icons/io";
 import { FiCheckCircle, FiEdit } from "react-icons/fi";
 import { AiOutlineDelete, AiOutlineUser } from "react-icons/ai";
 import { RxExit } from "react-icons/rx";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -71,17 +72,19 @@ export default function Dashboard() {
               </MenuButton>
               <Portal>
                 <MenuList>
-                  <MenuItem>
-                    <Icon
-                      as={AiOutlineUser}
-                      w="1rem"
-                      h="1rem"
-                      color="#3182CE"
-                    />
-                    <Text ml="0.5rem" fontSize="1rem">
-                      Meu Perfil
-                    </Text>
-                  </MenuItem>
+                  <Link to="/profile">
+                    <MenuItem>
+                      <Icon
+                        as={AiOutlineUser}
+                        w="1rem"
+                        h="1rem"
+                        color="#3182CE"
+                      />
+                      <Text ml="0.5rem" fontSize="1rem">
+                        Meu Perfil
+                      </Text>
+                    </MenuItem>
+                  </Link>
 
                   <MenuItem>
                     <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
@@ -105,17 +108,19 @@ export default function Dashboard() {
                 </MenuButton>
                 <Portal>
                   <MenuList>
-                    <MenuItem>
-                      <Icon
-                        as={AiOutlineUser}
-                        w="1rem"
-                        h="1rem"
-                        color="#3182CE"
-                      />
-                      <Text ml="0.5rem" fontSize="1rem">
-                        Meu Perfil
-                      </Text>
-                    </MenuItem>
+                    <Link to="/profile">
+                      <MenuItem>
+                        <Icon
+                          as={AiOutlineUser}
+                          w="1rem"
+                          h="1rem"
+                          color="#3182CE"
+                        />
+                        <Text ml="0.5rem" fontSize="1rem">
+                          Meu Perfil
+                        </Text>
+                      </MenuItem>
+                    </Link>
 
                     <MenuItem>
                       <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
