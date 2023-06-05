@@ -33,7 +33,7 @@ export const Header = styled.div`
 export const Section = styled.section`
   grid-area: section;
   padding: 2rem 5rem;
-  background-color: #ecf4fc;
+  background-color: #eee;
 
   display: flex;
   flex-direction: column;
@@ -48,7 +48,6 @@ export const Section = styled.section`
   .div-dados-pessoais,
   .div-alterar-senha {
     width: 100%;
-    /* background-color: #ff0; */
     margin-bottom: 2rem;
   }
 

@@ -35,9 +35,8 @@ import {
   BsFillArrowUpCircleFill,
 } from "react-icons/bs";
 import logo from "../../assets/logo.png";
-import { IoIosAdd } from "react-icons/io";
 import { FiCheckCircle, FiEdit } from "react-icons/fi";
-import { AiOutlineDelete, AiOutlineUser } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineUser, AiOutlineDown } from "react-icons/ai";
 import { RxExit } from "react-icons/rx";
 import { Link } from "react-router-dom";
 
@@ -51,18 +50,42 @@ export default function Dashboard() {
           <img className="logo" alt="logo" src={logo} loading="lazy" />
 
           {!isMobile && (
-            <Button
-              leftIcon={
-                <Icon as={IoIosAdd} w="2rem" h="2rem" color="#FFFFFF" />
-              }
-              mt="2rem"
-              width="80%"
-              borderRadius="2rem"
-              colorScheme="blue"
-              variant="solid"
-            >
-              Novo
-            </Button>
+            <Menu>
+              <MenuButton
+                mt="2rem"
+                width="80%"
+                as={Button}
+                rightIcon={<AiOutlineDown />}
+                colorScheme="blue"
+              >
+                Novo
+              </MenuButton>
+              <MenuList>
+                <MenuItem>
+                  <Icon
+                    as={BsFillArrowDownCircleFill}
+                    w="1rem"
+                    h="1rem"
+                    color="#f44336"
+                  />
+                  <Text ml="0.5rem" fontSize="1rem">
+                    Despesa
+                  </Text>
+                </MenuItem>
+
+                <MenuItem>
+                  <Icon
+                    as={BsFillArrowUpCircleFill}
+                    w="1rem"
+                    h="1rem"
+                    color="#4caf50"
+                  />
+                  <Text ml="0.5rem" fontSize="1rem">
+                    Receita
+                  </Text>
+                </MenuItem>
+              </MenuList>
+            </Menu>
           )}
 
           {isMobile && (
@@ -132,16 +155,40 @@ export default function Dashboard() {
                 </Portal>
               </Menu>
             ) : (
-              <Button
-                leftIcon={
-                  <Icon as={IoIosAdd} w="2rem" h="2rem" color="#FFFFFF" />
-                }
-                borderRadius="2rem"
-                colorScheme="blue"
-                variant="solid"
-              >
-                Novo
-              </Button>
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  rightIcon={<AiOutlineDown />}
+                  colorScheme="blue"
+                >
+                  Novo
+                </MenuButton>
+                <MenuList>
+                  <MenuItem>
+                    <Icon
+                      as={BsFillArrowDownCircleFill}
+                      w="1rem"
+                      h="1rem"
+                      color="#f44336"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Despesa
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem>
+                    <Icon
+                      as={BsFillArrowUpCircleFill}
+                      w="1rem"
+                      h="1rem"
+                      color="#4caf50"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Receita
+                    </Text>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
             )}
           </Header>
 

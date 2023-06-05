@@ -48,7 +48,7 @@ export const RightBox = styled.div`
   grid-area: rightbox;
   padding: 2rem;
   height: 100%;
-  background-color: #ecf4fc;
+  background-color: #eee;
   border-top-left-radius: 2rem;
 `;
 
