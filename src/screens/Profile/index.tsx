@@ -26,9 +26,10 @@ import {
 } from "react-icons/ai";
 import { RxExit } from "react-icons/rx";
 import { BiHide, BiShow } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -39,17 +40,14 @@ export default function Profile() {
     <>
       <Container>
         <Header>
-          <Link to="/">
-            <img className="logo" alt="logo" src={logo} loading="lazy" />
-          </Link>
+            <img onClick={() => navigate("/")} className="logo" alt="logo" src={logo} loading="lazy" />
           <Menu>
             <MenuButton>
               <Avatar w={10} h={10} bg="#3182CE" />
             </MenuButton>
             <Portal>
               <MenuList>
-                <Link to="/profile">
-                  <MenuItem>
+                  <MenuItem onClick={() => navigate("/profile")}>
                     <Icon
                       as={AiOutlineUser}
                       w="1rem"
@@ -60,7 +58,6 @@ export default function Profile() {
                       Meu Perfil
                     </Text>
                   </MenuItem>
-                </Link>
 
                 <MenuItem>
                   <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
@@ -75,9 +72,7 @@ export default function Profile() {
 
         <Section>
           <div className="div-meu-perfil">
-            <Link to="/dashboard">
-              <Icon cursor="pointer" as={AiOutlineLeft} mr="1rem" mt="0.6rem"  />
-            </Link>
+            <Icon onClick={() => navigate(-1)} cursor="pointer" as={AiOutlineLeft} mr="1rem" mt="0.6rem" />
             <Text fontSize="1.5rem">Meu Perfil</Text>
           </div>
 

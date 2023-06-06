@@ -4,6 +4,7 @@ import Register from "./screens/Register";
 import Login from "./screens/Login";
 import Dashboard from "./screens/Dashboard";
 import Profile from "./screens/Profile";
+import MyBills from "./screens/MyBills";
 
 export default function Routes() {
   return (
@@ -14,6 +15,7 @@ export default function Routes() {
         <Route path="/login" element={<Login />}></Route>
         <Route path="/dashboard" element={<Dashboard />}></Route>
         <Route path="/profile" element={<Profile />}></Route>
+        <Route path="/my-bills" element={<MyBills />}></Route>
       </Rotas>
     </BrowserRouter>
   );

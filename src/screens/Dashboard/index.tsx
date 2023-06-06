@@ -1,7 +1,6 @@
 import { useState, useRef, ChangeEvent } from "react";
 import {
   Container,
-  LeftBox,
   RightBox,
   Header,
   DivCards,
@@ -48,12 +47,12 @@ import {
   BsFillArrowDownCircleFill,
   BsFillArrowUpCircleFill,
 } from "react-icons/bs";
-import logo from "../../assets/logo.png";
 import { FiCheckCircle, FiEdit } from "react-icons/fi";
-import { AiOutlineDelete, AiOutlineUser, AiFillBank } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineUser } from "react-icons/ai";
 import { RxExit } from "react-icons/rx";
 import { IoMdAdd } from "react-icons/io";
 import { Link } from "react-router-dom";
+import SideMenu from "../../components/SideMenu";
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -142,59 +141,7 @@ export default function Dashboard() {
     <>
       {renderNewExpense()}
       <Container>
-        <LeftBox>
-          <img className="logo" alt="logo" src={logo} loading="lazy" />
-
-          {!isMobile && (
-            <>
-              <div className="div-minhas-contas" style={{ marginTop: "2rem" }}>
-                <AiOutlineUser />
-                <Text fontSize="1rem" ml="1rem">
-                  Meu Perfil
-                </Text>
-              </div>
-
-              <div className="div-minhas-contas">
-                <AiFillBank />
-                <Text fontSize="1rem" ml="1rem">
-                  Minhas contas
-                </Text>
-              </div>
-            </>
-          )}
-
-          {isMobile && (
-            <Menu>
-              <MenuButton>
-                <Avatar w={10} h={10} bg="#3182CE" />
-              </MenuButton>
-              <Portal>
-                <MenuList>
-                  <Link to="/profile">
-                    <MenuItem>
-                      <Icon
-                        as={AiOutlineUser}
-                        w="1rem"
-                        h="1rem"
-                        color="#3182CE"
-                      />
-                      <Text ml="0.5rem" fontSize="1rem">
-                        Meu Perfil
-                      </Text>
-                    </MenuItem>
-                  </Link>
-
-                  <MenuItem>
-                    <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
-                    <Text ml="0.5rem" fontSize="1rem">
-                      Sair
-                    </Text>
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
-          )}
-        </LeftBox>
+        <SideMenu/>
 
         <RightBox>
           <Header>
