@@ -8,6 +8,7 @@ import {
   Card,
   CardLeft,
   CardRight,
+  DivTitleDespesas,
   DivDespesas,
   DivAcoes,
   DivSwitch,
@@ -49,8 +50,9 @@ import {
 } from "react-icons/bs";
 import logo from "../../assets/logo.png";
 import { FiCheckCircle, FiEdit } from "react-icons/fi";
-import { AiOutlineDelete, AiOutlineUser, AiOutlineDown } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineUser, AiFillBank } from "react-icons/ai";
 import { RxExit } from "react-icons/rx";
+import { IoMdAdd } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
@@ -144,42 +146,21 @@ export default function Dashboard() {
           <img className="logo" alt="logo" src={logo} loading="lazy" />
 
           {!isMobile && (
-            <Menu>
-              <MenuButton
-                mt="2rem"
-                width="80%"
-                as={Button}
-                rightIcon={<AiOutlineDown />}
-                colorScheme="blue"
-              >
-                Novo
-              </MenuButton>
-              <MenuList>
-                <MenuItem onClick={onOpen}>
-                  <Icon
-                    as={BsFillArrowDownCircleFill}
-                    w="1rem"
-                    h="1rem"
-                    color="#f44336"
-                  />
-                  <Text ml="0.5rem" fontSize="1rem">
-                    Despesa
-                  </Text>
-                </MenuItem>
+            <>
+              <div className="div-minhas-contas" style={{ marginTop: "2rem" }}>
+                <AiOutlineUser />
+                <Text fontSize="1rem" ml="1rem">
+                  Meu Perfil
+                </Text>
+              </div>
 
-                <MenuItem>
-                  <Icon
-                    as={BsFillArrowUpCircleFill}
-                    w="1rem"
-                    h="1rem"
-                    color="#4caf50"
-                  />
-                  <Text ml="0.5rem" fontSize="1rem">
-                    Receita
-                  </Text>
-                </MenuItem>
-              </MenuList>
-            </Menu>
+              <div className="div-minhas-contas">
+                <AiFillBank />
+                <Text fontSize="1rem" ml="1rem">
+                  Minhas contas
+                </Text>
+              </div>
+            </>
           )}
 
           {isMobile && (
@@ -252,10 +233,14 @@ export default function Dashboard() {
               <Menu>
                 <MenuButton
                   as={Button}
-                  rightIcon={<AiOutlineDown />}
+                  leftIcon={
+                    <IoMdAdd
+                      style={{ color: "white", height: 20, width: 25 }}
+                    />
+                  }
                   colorScheme="blue"
                 >
-                  Novo
+                  Nova
                 </MenuButton>
                 <MenuList>
                   <MenuItem onClick={onOpen}>
@@ -342,7 +327,50 @@ export default function Dashboard() {
             </Card>
           </DivCards>
 
-          <Text fontSize="1.5rem">Despesas</Text>
+          <DivTitleDespesas>
+            <Text fontSize="1.5rem">Despesas</Text>
+
+            {!isMobile && (
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  leftIcon={
+                    <IoMdAdd
+                      style={{ color: "white", height: 20, width: 25 }}
+                    />
+                  }
+                  colorScheme="blue"
+                >
+                  Nova
+                </MenuButton>
+                <MenuList>
+                  <MenuItem onClick={onOpen}>
+                    <Icon
+                      as={BsFillArrowDownCircleFill}
+                      w="1rem"
+                      h="1rem"
+                      color="#f44336"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Despesa
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem>
+                    <Icon
+                      as={BsFillArrowUpCircleFill}
+                      w="1rem"
+                      h="1rem"
+                      color="#4caf50"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Receita
+                    </Text>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            )}
+          </DivTitleDespesas>
 
           <DivDespesas>
             <Text fontSize="1rem" mb="2rem">

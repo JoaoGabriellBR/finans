@@ -21,18 +21,18 @@ export const Container = styled.div`
 
 export const LeftBox = styled.div`
   grid-area: leftbox;
-  padding: 2rem;
   height: 100%;
   background-color: transparent;
-
+  
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
-
-  @media (max-width: 1024px){
+  align-items: flex-start;
+  
+  @media (max-width: 1024px) {
     flex-direction: row;
     justify-content: space-between;
+    padding: 2rem;
   }
 
   .logo {
@@ -40,8 +40,28 @@ export const LeftBox = styled.div`
     height: 2rem;
     cursor: pointer;
     padding: 0;
-    margin: 0;
-}
+    margin-left: 2rem;
+    margin-top: 2rem;
+
+    @media (max-width: 1024px){
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .div-minhas-contas {
+    padding: 1rem 0 1rem 2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover{
+      background-color: #eee;
+    }
+  }
 `;
 
 export const RightBox = styled.div`
@@ -95,6 +115,15 @@ export const CardLeft = styled.div`
 `;
 
 export const CardRight = styled.div``;
+
+
+export const DivTitleDespesas = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 
 export const DivDespesas = styled.div`
