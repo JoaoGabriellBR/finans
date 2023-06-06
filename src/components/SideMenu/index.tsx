@@ -1,4 +1,4 @@
-import { LeftBox } from "./styles";
+import { LeftBox, DivMenuMobile } from "./styles";
 import {
   Text,
   Menu,
@@ -16,8 +16,8 @@ import { RxExit, RxDashboard } from "react-icons/rx";
 import logo from "../../assets/logo.png";
 
 export default function SideMenu() {
-  const [isMobile] = useMediaQuery("(max-width: 1024px)");
   const navigate = useNavigate();
+  const [isMobile] = useMediaQuery("(max-width: 1024px)");
 
   return (
     <LeftBox>
@@ -59,28 +59,51 @@ export default function SideMenu() {
       )}
 
       {isMobile && (
-        <Menu>
-          <MenuButton>
-            <Avatar w={10} h={10} bg="#3182CE" />
-          </MenuButton>
-          <Portal>
-            <MenuList>
-              <MenuItem onClick={() => navigate("/profile")}>
-                <Icon as={AiOutlineUser} w="1rem" h="1rem" color="#3182CE" />
-                <Text ml="0.5rem" fontSize="1rem">
-                  Meu Perfil
-                </Text>
-              </MenuItem>
+        <>
+          <DivMenuMobile>
+            <Menu>
+              <MenuButton>
+                <Avatar w={10} h={10} bg="#3182CE" />
+              </MenuButton>
+              <Portal>
+                <MenuList>
+                  <MenuItem onClick={() => navigate("/profile")}>
+                    <Icon
+                      as={AiOutlineUser}
+                      w="1rem"
+                      h="1rem"
+                      color="#3182CE"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Meu Perfil
+                    </Text>
+                  </MenuItem>
 
-              <MenuItem>
-                <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
-                <Text ml="0.5rem" fontSize="1rem">
-                  Sair
-                </Text>
-              </MenuItem>
-            </MenuList>
-          </Portal>
-        </Menu>
+                  <MenuItem onClick={() => navigate("/dashboard")}>
+                    <Icon as={RxDashboard} w="1rem" h="1rem" color="#3182CE" />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Dashboard
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem onClick={() => navigate("/my-bills")}>
+                    <Icon as={AiFillBank} w="1rem" h="1rem" color="#3182CE" />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Minhas Contas
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem>
+                    <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Sair
+                    </Text>
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          </DivMenuMobile>
+        </>
       )}
     </LeftBox>
   );

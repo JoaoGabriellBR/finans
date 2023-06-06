@@ -23,8 +23,9 @@ import {
   AiOutlineLeft,
   AiOutlineMail,
   AiOutlineLock,
+  AiFillBank
 } from "react-icons/ai";
-import { RxExit } from "react-icons/rx";
+import { RxExit, RxDashboard } from "react-icons/rx";
 import { BiHide, BiShow } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
@@ -56,6 +57,30 @@ export default function Profile() {
                     />
                     <Text ml="0.5rem" fontSize="1rem">
                       Meu Perfil
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem onClick={() => navigate("/dashboard")}>
+                    <Icon
+                      as={RxDashboard}
+                      w="1rem"
+                      h="1rem"
+                      color="#3182CE"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Dashboard
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem onClick={() => navigate("/my-bills")}>
+                    <Icon
+                      as={AiFillBank}
+                      w="1rem"
+                      h="1rem"
+                      color="#3182CE"
+                    />
+                    <Text ml="0.5rem" fontSize="1rem">
+                      Minhas Contas
                     </Text>
                   </MenuItem>
 

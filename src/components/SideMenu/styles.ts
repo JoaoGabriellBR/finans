@@ -44,3 +44,10 @@ export const LeftBox = styled.div`
     }
   }
 `;
+
+export const DivMenuMobile = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+`;
