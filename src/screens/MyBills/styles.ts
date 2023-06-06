@@ -98,7 +98,6 @@ export const CardContas = styled(Card)`
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    background: red;
     margin-bottom: 1rem;
   }
 `;

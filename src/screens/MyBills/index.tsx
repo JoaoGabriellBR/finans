@@ -15,6 +15,7 @@ import {
   MenuList,
   Portal,
   Avatar,
+  Button,
   Icon,
   useMediaQuery,
 } from "@chakra-ui/react";
@@ -82,11 +83,19 @@ export default function MyBills() {
           <CardContas>
             <div className="div-nome-conta">
               <Icon as={FaMoneyCheckAlt} />
-              <Text fontSize="1rem">Carteira</Text>
+              <Text fontSize="1.5rem">Carteira</Text>
             </div>
-            <div className="div-saldo-atual">d</div>
-            <div className="div-saldo-previsto">d</div>
-            <div className="div-adicionar-despesa">d</div>
+            <div className="div-saldo-atual">
+              <Text fontSize="0.9rem">Saldo atual</Text>
+              <Text as="b" color="green" fontSize="0.9rem">R$ 500,00</Text>
+            </div>
+            <div className="div-saldo-previsto">
+              <Text fontSize="0.9rem">Saldo previsto</Text>
+              <Text as="b" color="green" fontSize="0.9rem">R$ 500,00</Text>
+            </div>
+            <div className="div-adicionar-despesa">
+              <Button variant="ghost">Adicionar despesa</Button>
+            </div>
           </CardContas>
         </DivCards>
       </RightBox>
