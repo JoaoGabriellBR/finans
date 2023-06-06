@@ -1,5 +1,12 @@
 import SideMenu from "../../components/SideMenu";
-import { Container, RightBox, Header } from "./styles";
+import {
+  Container,
+  RightBox,
+  Header,
+  DivCards,
+  CardNovaConta,
+  CardContas,
+} from "./styles";
 import {
   Text,
   Menu,
@@ -14,6 +21,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { AiOutlineUser, AiOutlineLeft } from "react-icons/ai";
 import { RxExit } from "react-icons/rx";
+import { IoIosAddCircleOutline } from "react-icons/io";
+import { FaMoneyCheckAlt } from "react-icons/fa";
 
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -64,6 +73,22 @@ export default function MyBills() {
             </Menu>
           )}
         </Header>
+
+        <DivCards>
+          <CardNovaConta>
+            <Icon as={IoIosAddCircleOutline} h={55} w={55} />
+            <Text fontSize="1.5rem">Nova conta</Text>
+          </CardNovaConta>
+          <CardContas>
+            <div className="div-nome-conta">
+              <Icon as={FaMoneyCheckAlt} />
+              <Text fontSize="1rem">Carteira</Text>
+            </div>
+            <div className="div-saldo-atual">d</div>
+            <div className="div-saldo-previsto">d</div>
+            <div className="div-adicionar-despesa">d</div>
+          </CardContas>
+        </DivCards>
       </RightBox>
     </Container>
   );

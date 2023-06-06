@@ -40,3 +40,65 @@ export const Header = styled.header`
     align-items: center;
   }
 `;
+
+export const DivCards = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+`;
+
+export const Card = styled.div`
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  width: 23rem;
+  max-width: 80%;
+  height: 15rem;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  margin-right: 2rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1024px) {
+    margin-right: 0;
+  }
+`;
+
+export const CardNovaConta = styled(Card)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #3182ce;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+    transition: ease-in-out 0.3s;
+  }
+`;
+
+export const CardContas = styled(Card)`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  .div-nome-conta,
+  .div-saldo-atual,
+  .div-saldo-previsto,
+  .div-adicionar-despesa {
+    width: 100%;
+    min-height: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    background: red;
+    margin-bottom: 1rem;
+  }
+`;
