@@ -89,8 +89,7 @@ export const CardContas = styled(Card)`
 
   .div-nome-conta,
   .div-saldo-atual,
-  .div-saldo-previsto,
-  .div-adicionar-despesa {
+  .div-saldo-previsto {
     width: 100%;
     min-height: 1rem;
     display: flex;
@@ -98,6 +97,28 @@ export const CardContas = styled(Card)`
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+  }
+
+  .div-carteira {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+`;
+
+export const DivSwitch = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+
+  .div-switch-icon {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 `;
