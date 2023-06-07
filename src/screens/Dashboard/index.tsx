@@ -61,11 +61,13 @@ export default function Dashboard() {
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openEditExpense, setOpenEditExpense] = useState(false);
   const [openNewRevenue, setOpenNewRevenue] = useState(false);
+  const [openEditRevenue, setOpenEditRevenue] = useState(false);
 
   const [value, setValue] = useState("");
   
   const [valueNewRevenue, setValueNewRevenue] = useState("");
   const [valueEditExpense, setValueEditExpense] = useState("");
+  const [valueEditRevenue, setValueEditRevenue] = useState("");
 
   const formatCurrency = (value: string) => {
     const numericValue = parseInt(value.replace(/\D/g, ""));
@@ -90,6 +92,11 @@ export default function Dashboard() {
   const handleChangeEditExpense = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     setValueEditExpense(formatCurrency(inputValue));
+  };
+
+  const handleChangeEditRevenue = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setValueEditRevenue(formatCurrency(inputValue));
   };
 
   const renderNewExpense = () => {
@@ -257,11 +264,69 @@ export default function Dashboard() {
     );
   };
 
+  const renderEditRevenue = () => {
+    return (
+      <Modal isOpen={openEditRevenue} onClose={() => setOpenEditRevenue(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Editar Receita</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl id="currency" mb="2rem">
+              <Input
+                variant="flushed"
+                type="text"
+                // value={valueEditRevenue}
+                value="R$ 50,00"
+                onChange={handleChangeEditRevenue}
+                placeholder="R$ 0,00"
+                _placeholder={{ color: "green" }}
+                fontSize="1.5rem"
+                color="green"
+              />
+            </FormControl>
+
+            <Input
+              variant="flushed"
+              type="text"
+              placeholder="Descrição"
+              maxLength={500}
+              value="Receita de teste"
+            />
+
+            <DivSwitch>
+              <div className="div-switch-icon">
+                <Icon
+                  cursor="pointer"
+                  as={FiCheckCircle}
+                  w="1rem"
+                  h="1rem"
+                  mr="1rem"
+                />
+                <Text fontSize="1rem">Não foi recebida</Text>
+              </div>
+              <Switch colorScheme="green" />
+            </DivSwitch>
+
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="green" mr={3}>
+              Salvar
+            </Button>
+            <Button onClick={() => setOpenEditRevenue(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
+
   return (
     <>
       {renderNewExpense()}
       {renderEditExpense()}
       {renderNewRevenue()}
+      {renderEditRevenue()}
       <Container>
         <SideMenu />
 
@@ -503,8 +568,8 @@ export default function Dashboard() {
                   <Tr>
                     <Td>Pendente</Td>
                     <Td isNumeric>04/06/2023</Td>
-                    <Td>Algar telecom</Td>
-                    <Td color="green">R$ 31,03</Td>
+                    <Td>Receita de teste</Td>
+                    <Td color="green">R$ 50,00</Td>
                     <Td>
                       <DivAcoes>
                         <Icon
@@ -513,7 +578,7 @@ export default function Dashboard() {
                           w="1rem"
                           h="1rem"
                         />
-                        <Icon cursor="pointer" as={FiEdit} w="1rem" h="1rem" />
+                        <Icon onClick={() => setOpenEditRevenue(true)} cursor="pointer" as={FiEdit} w="1rem" h="1rem" />
                         <Icon
                           cursor="pointer"
                           as={AiOutlineDelete}
