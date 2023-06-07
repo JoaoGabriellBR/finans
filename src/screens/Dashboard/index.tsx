@@ -59,10 +59,13 @@ export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
+  const [openEditExpense, setOpenEditExpense] = useState(false);
   const [openNewRevenue, setOpenNewRevenue] = useState(false);
 
   const [value, setValue] = useState("");
+  
   const [valueNewRevenue, setValueNewRevenue] = useState("");
+  const [valueEditExpense, setValueEditExpense] = useState("");
 
   const formatCurrency = (value: string) => {
     const numericValue = parseInt(value.replace(/\D/g, ""));
@@ -82,6 +85,11 @@ export default function Dashboard() {
   const handleChangeNewRevenue = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     setValueNewRevenue(formatCurrency(inputValue));
+  };
+
+  const handleChangeEditExpense = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setValueEditExpense(formatCurrency(inputValue));
   };
 
   const renderNewExpense = () => {
@@ -137,6 +145,62 @@ export default function Dashboard() {
       </Modal>
     );
   };
+
+  const renderEditExpense = () => {
+    return (
+      <Modal isOpen={openEditExpense} onClose={() => setOpenEditExpense(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Editar Despesa</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl id="currency" mb="2rem">
+              <Input
+                variant="flushed"
+                type="text"
+                // value={value}
+                value="R$ 31,03"
+                onChange={handleChangeEditExpense}
+                placeholder="R$ 0,00"
+                _placeholder={{ color: "#f00" }}
+                fontSize="1.5rem"
+                color="#f00"
+              />
+            </FormControl>
+
+            <Input
+              variant="flushed"
+              type="text"
+              placeholder="Descrição"
+              maxLength={500}
+              value="Algar telecom"
+            />
+
+            <DivSwitch>
+              <div className="div-switch-icon">
+                <Icon
+                  cursor="pointer"
+                  as={FiCheckCircle}
+                  w="1rem"
+                  h="1rem"
+                  mr="1rem"
+                />
+                <Text fontSize="1rem">Não foi paga</Text>
+              </div>
+              <Switch colorScheme="red" />
+            </DivSwitch>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3}>
+              Salvar
+            </Button>
+            <Button onClick={() => setOpenEditExpense(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }
 
   const renderNewRevenue = () => {
     return (
@@ -196,6 +260,7 @@ export default function Dashboard() {
   return (
     <>
       {renderNewExpense()}
+      {renderEditExpense()}
       {renderNewRevenue()}
       <Container>
         <SideMenu />
@@ -382,7 +447,7 @@ export default function Dashboard() {
                           w="1rem"
                           h="1rem"
                         />
-                        <Icon cursor="pointer" as={FiEdit} w="1rem" h="1rem" />
+                        <Icon onClick={() => setOpenEditExpense(true)} cursor="pointer" as={FiEdit} w="1rem" h="1rem" />
                         <Icon
                           cursor="pointer"
                           as={AiOutlineDelete}
