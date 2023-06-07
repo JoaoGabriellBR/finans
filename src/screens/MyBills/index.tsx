@@ -50,9 +50,12 @@ export default function MyBills() {
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openNewBill, setOpenNewBill] = useState(false);
+  const [openEditBill, setOpenEditBill] = useState(false);
+  const [openDeleteBill, setOpenDeleteBill] = useState(false);
 
   const [valueNewExpense, setValueNewExpense] = useState("");
   const [valueNewBill, setValueNewBill] = useState("");
+  const [valueEditBill, setValueEditBill] = useState("");
 
   const formatCurrency = (value: string) => {
     const numericValue = parseInt(value.replace(/\D/g, ""));
@@ -67,6 +70,11 @@ export default function MyBills() {
   const handleChangeNewBill = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     setValueNewBill(formatCurrency(inputValue));
+  };
+
+  const handleChangeEditBill = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setValueEditBill(formatCurrency(inputValue));
   };
 
   const handleChangeNewExpense = (event: ChangeEvent<HTMLInputElement>) => {
@@ -113,6 +121,73 @@ export default function MyBills() {
       </Modal>
     );
   };
+
+  const renderEditBill = () => {
+    return (
+      <Modal isOpen={openEditBill} onClose={() => setOpenEditBill(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Editar Conta</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl id="currency" mb="2rem">
+              <Input
+                variant="flushed"
+                type="text"
+                // value={valueEditBill}
+                value="R$ 500,00"
+                onChange={handleChangeEditBill}
+                placeholder="R$ 0,00"
+                _placeholder={{ color: "#00f" }}
+                fontSize="1.5rem"
+                color="#00f"
+              />
+            </FormControl>
+
+            <Input
+              variant="flushed"
+              type="text"
+              placeholder="Descrição"
+              value="Carteira"
+              maxLength={500}
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3}>
+              Salvar
+            </Button>
+            <Button onClick={() => setOpenEditBill(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }
+
+  const renderDeleteBill = () => {
+    return (
+      <Modal isOpen={openDeleteBill} onClose={() => setOpenDeleteBill(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Excluir Conta</ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody pb={6}>
+            <Text fontSize="1rem">
+              Tem certeza que deseja remover essa conta?  Esta ação não poderá ser desfeita!
+            </Text>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3}>
+              Excluir
+            </Button>
+            <Button onClick={() => setOpenDeleteBill(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }
 
   const renderNewExpense = () => {
     return (
@@ -172,6 +247,8 @@ export default function MyBills() {
     <>
       {renderNewBill()}
       {renderNewExpense()}
+      {renderEditBill()}
+      {renderDeleteBill()}
       <Container>
         <SideMenu />
         <RightBox>
@@ -237,11 +314,11 @@ export default function MyBills() {
 
                   <Portal>
                     <MenuList>
-                      <MenuItem>
+                      <MenuItem onClick={() => setOpenEditBill(true)}>
                         <Icon as={AiOutlineEdit} mr="1rem" />
                         Editar
                       </MenuItem>
-                      <MenuItem>
+                      <MenuItem onClick={() => setOpenDeleteBill(true)}>
                         <Icon as={AiOutlineDelete} mr="1rem" />
                         Excluir
                       </MenuItem>
