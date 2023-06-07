@@ -64,7 +64,7 @@ export default function Dashboard() {
   const [openEditRevenue, setOpenEditRevenue] = useState(false);
 
   const [value, setValue] = useState("");
-  
+
   const [valueNewRevenue, setValueNewRevenue] = useState("");
   const [valueEditExpense, setValueEditExpense] = useState("");
   const [valueEditRevenue, setValueEditRevenue] = useState("");
@@ -207,7 +207,7 @@ export default function Dashboard() {
         </ModalContent>
       </Modal>
     );
-  }
+  };
 
   const renderNewRevenue = () => {
     return (
@@ -250,7 +250,6 @@ export default function Dashboard() {
               </div>
               <Switch colorScheme="green" />
             </DivSwitch>
-
           </ModalBody>
 
           <ModalFooter>
@@ -307,7 +306,6 @@ export default function Dashboard() {
               </div>
               <Switch colorScheme="green" />
             </DivSwitch>
-
           </ModalBody>
 
           <ModalFooter>
@@ -512,7 +510,13 @@ export default function Dashboard() {
                           w="1rem"
                           h="1rem"
                         />
-                        <Icon onClick={() => setOpenEditExpense(true)} cursor="pointer" as={FiEdit} w="1rem" h="1rem" />
+                        <Icon
+                          onClick={() => setOpenEditExpense(true)}
+                          cursor="pointer"
+                          as={FiEdit}
+                          w="1rem"
+                          h="1rem"
+                        />
                         <Icon
                           cursor="pointer"
                           as={AiOutlineDelete}
@@ -578,7 +582,13 @@ export default function Dashboard() {
                           w="1rem"
                           h="1rem"
                         />
-                        <Icon onClick={() => setOpenEditRevenue(true)} cursor="pointer" as={FiEdit} w="1rem" h="1rem" />
+                        <Icon
+                          onClick={() => setOpenEditRevenue(true)}
+                          cursor="pointer"
+                          as={FiEdit}
+                          w="1rem"
+                          h="1rem"
+                        />
                         <Icon
                           cursor="pointer"
                           as={AiOutlineDelete}
