@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, ChangeEvent } from "react";
 import {
   Container,
   RightBox,
@@ -9,6 +9,8 @@ import {
   CardRight,
   DivTitleDespesas,
   DivDespesas,
+  DivTitleReceitas,
+  DivReceitas,
   DivAcoes,
   DivSwitch,
 } from "./styles";
@@ -40,7 +42,6 @@ import {
   ModalCloseButton,
   ModalOverlay,
   useMediaQuery,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { SiStarlingbank } from "react-icons/si";
 import {
@@ -56,12 +57,12 @@ import SideMenu from "../../components/SideMenu";
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const initialRef = useRef(null);
-  const finalRef = useRef(null);
+  const [openNewExpense, setOpenNewExpense] = useState(false);
+  const [openNewRevenue, setOpenNewRevenue] = useState(false);
 
   const [value, setValue] = useState("");
+  const [valueNewRevenue, setValueNewRevenue] = useState("");
 
   const formatCurrency = (value: string) => {
     const numericValue = parseInt(value.replace(/\D/g, ""));
@@ -78,14 +79,14 @@ export default function Dashboard() {
     setValue(formatCurrency(inputValue));
   };
 
+  const handleChangeNewRevenue = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setValueNewRevenue(formatCurrency(inputValue));
+  };
+
   const renderNewExpense = () => {
     return (
-      <Modal
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}
-        isOpen={isOpen}
-        onClose={onClose}
-      >
+      <Modal isOpen={openNewExpense} onClose={() => setOpenNewExpense(false)}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Nova Despesa</ModalHeader>
@@ -130,7 +131,62 @@ export default function Dashboard() {
             <Button colorScheme="red" mr={3}>
               Salvar
             </Button>
-            <Button onClick={onClose}>Cancelar</Button>
+            <Button onClick={() => setOpenNewExpense(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
+
+  const renderNewRevenue = () => {
+    return (
+      <Modal isOpen={openNewRevenue} onClose={() => setOpenNewRevenue(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Nova Receita</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl id="currency" mb="2rem">
+              <Input
+                variant="flushed"
+                type="text"
+                value={valueNewRevenue}
+                onChange={handleChangeNewRevenue}
+                placeholder="R$ 0,00"
+                _placeholder={{ color: "green" }}
+                fontSize="1.5rem"
+                color="green"
+              />
+            </FormControl>
+
+            <Input
+              variant="flushed"
+              type="text"
+              placeholder="Descrição"
+              maxLength={500}
+            />
+
+            <DivSwitch>
+              <div className="div-switch-icon">
+                <Icon
+                  cursor="pointer"
+                  as={FiCheckCircle}
+                  w="1rem"
+                  h="1rem"
+                  mr="1rem"
+                />
+                <Text fontSize="1rem">Não foi recebida</Text>
+              </div>
+              <Switch colorScheme="green" />
+            </DivSwitch>
+
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="green" mr={3}>
+              Salvar
+            </Button>
+            <Button onClick={() => setOpenNewRevenue(false)}>Cancelar</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -140,8 +196,9 @@ export default function Dashboard() {
   return (
     <>
       {renderNewExpense()}
+      {renderNewRevenue()}
       <Container>
-        <SideMenu/>
+        <SideMenu />
 
         <RightBox>
           <Header>
@@ -190,7 +247,7 @@ export default function Dashboard() {
                   Nova
                 </MenuButton>
                 <MenuList>
-                  <MenuItem onClick={onOpen}>
+                  <MenuItem onClick={() => setOpenNewExpense(true)}>
                     <Icon
                       as={BsFillArrowDownCircleFill}
                       w="1rem"
@@ -202,7 +259,7 @@ export default function Dashboard() {
                     </Text>
                   </MenuItem>
 
-                  <MenuItem>
+                  <MenuItem onClick={() => setOpenNewRevenue(true)}>
                     <Icon
                       as={BsFillArrowUpCircleFill}
                       w="1rem"
@@ -278,44 +335,15 @@ export default function Dashboard() {
             <Text fontSize="1.5rem">Despesas</Text>
 
             {!isMobile && (
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  leftIcon={
-                    <IoMdAdd
-                      style={{ color: "white", height: 20, width: 25 }}
-                    />
-                  }
-                  colorScheme="blue"
-                >
-                  Nova
-                </MenuButton>
-                <MenuList>
-                  <MenuItem onClick={onOpen}>
-                    <Icon
-                      as={BsFillArrowDownCircleFill}
-                      w="1rem"
-                      h="1rem"
-                      color="#f44336"
-                    />
-                    <Text ml="0.5rem" fontSize="1rem">
-                      Despesa
-                    </Text>
-                  </MenuItem>
-
-                  <MenuItem>
-                    <Icon
-                      as={BsFillArrowUpCircleFill}
-                      w="1rem"
-                      h="1rem"
-                      color="#4caf50"
-                    />
-                    <Text ml="0.5rem" fontSize="1rem">
-                      Receita
-                    </Text>
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+              <Button
+                onClick={() => setOpenNewExpense(true)}
+                leftIcon={
+                  <IoMdAdd style={{ color: "white", height: 20, width: 25 }} />
+                }
+                colorScheme="red"
+              >
+                Nova despesa
+              </Button>
             )}
           </DivTitleDespesas>
 
@@ -368,6 +396,72 @@ export default function Dashboard() {
               </Table>
             </TableContainer>
           </DivDespesas>
+
+          <DivTitleReceitas>
+            <Text fontSize="1.5rem">Receitas</Text>
+
+            {!isMobile && (
+              <Button
+                onClick={() => setOpenNewRevenue(true)}
+                leftIcon={
+                  <IoMdAdd style={{ color: "white", height: 20, width: 25 }} />
+                }
+                colorScheme="green"
+              >
+                Nova receita
+              </Button>
+            )}
+          </DivTitleReceitas>
+
+          <DivReceitas>
+            <Text fontSize="1rem" mb="2rem">
+              Junho de 2023
+            </Text>
+
+            <TableContainer width="100%">
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th width="20%">Situação</Th>
+                    <Th width="20%" isNumeric>
+                      Data
+                    </Th>
+                    <Th width="30%">Descrição</Th>
+                    <Th width="5%" isNumeric>
+                      Valor
+                    </Th>
+                    <Th width="15%">Ações</Th>
+                  </Tr>
+                </Thead>
+
+                <Tbody>
+                  <Tr>
+                    <Td>Pendente</Td>
+                    <Td isNumeric>04/06/2023</Td>
+                    <Td>Algar telecom</Td>
+                    <Td color="green">R$ 31,03</Td>
+                    <Td>
+                      <DivAcoes>
+                        <Icon
+                          cursor="pointer"
+                          as={FiCheckCircle}
+                          w="1rem"
+                          h="1rem"
+                        />
+                        <Icon cursor="pointer" as={FiEdit} w="1rem" h="1rem" />
+                        <Icon
+                          cursor="pointer"
+                          as={AiOutlineDelete}
+                          w="1rem"
+                          h="1rem"
+                        />
+                      </DivAcoes>
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </DivReceitas>
         </RightBox>
       </Container>
     </>

@@ -72,16 +72,22 @@ export const CardLeft = styled.div`
 export const CardRight = styled.div``;
 
 
-export const DivTitleDespesas = styled.div`
-  width: 100%;
+export const DivBaseTitle = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 `;
 
+export const DivTitleDespesas = styled(DivBaseTitle)`
+  width: 100%;
+`;
 
-export const DivDespesas = styled.div`
+export const DivTitleReceitas = styled(DivBaseTitle)`
+  width: 100%;
+`;
+
+export const DivBase = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -92,8 +98,16 @@ export const DivDespesas = styled.div`
   border-radius: 1.5rem;
   background-color: #fff;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   margin-top: 2rem;
+`;
+
+export const DivDespesas = styled(DivBase)`
+  margin-bottom: 2rem;
+`;
+
+export const DivReceitas = styled(DivBase)`
+  margin-bottom: 2rem;
 `;
 
 export const DivAcoes = styled.div`
