@@ -1,24 +1,32 @@
 import { Cabecalho } from "./styles";
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import logo from "../../assets/logo.png";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
+
   return (
     <Cabecalho>
-      <Link to="/">
-        <img className="logo" alt="logo" src={logo} loading="lazy" />
-      </Link>
+      <img
+        onClick={() => navigate("/")}
+        className="logo"
+        alt="logo"
+        src={logo}
+        loading="lazy"
+      />
 
       <ButtonGroup spacing="5">
-        <Link to="/login">
-          <Button colorScheme="blue" variant="outline">
-            Login
-          </Button>
-        </Link>
-        <Link to="/register">
-          <Button colorScheme="blue">Cadastre-se</Button>
-        </Link>
+        <Button
+          onClick={() => navigate("/login")}
+          colorScheme="blue"
+          variant="outline"
+        >
+          Login
+        </Button>
+        <Button onClick={() => navigate("/register")} colorScheme="blue">
+          Cadastre-se
+        </Button>
       </ButtonGroup>
     </Cabecalho>
   );

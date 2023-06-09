@@ -14,10 +14,11 @@ import {
 } from "@chakra-ui/react";
 import { AiOutlineUser, AiOutlineMail, AiOutlineLock } from "react-icons/ai";
 import { BiShow, BiHide } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const handleShowPassword = () => {
@@ -30,9 +31,9 @@ export default function Register() {
         <Header />
         <Section>
           <Form>
-          <Text mb="1.5rem" fontSize="3rem">
-            Cadastro
-          </Text>
+            <Text mb="1.5rem" fontSize="3rem">
+              Cadastro
+            </Text>
             <FormControl mb="1.5rem" isRequired>
               <FormLabel>Nome:</FormLabel>
               <InputGroup>
@@ -90,9 +91,9 @@ export default function Register() {
             </Button>
 
             <Text fontSize="0.8rem">Já tem uma conta?</Text>
-            <Link to="/login">
-              <Text fontSize="0.8rem">Faça login aqui</Text>
-            </Link>
+            <Text onClick={() => navigate("/login")} fontSize="0.8rem">
+              Faça login aqui
+            </Text>
           </Form>
         </Section>
       </Container>

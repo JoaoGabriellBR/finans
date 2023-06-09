@@ -13,7 +13,7 @@ import {
   DivReceitas,
   DivAcoes,
   DivSwitch,
-  DivDelete
+  DivDelete,
 } from "./styles";
 import {
   Menu,
@@ -54,11 +54,12 @@ import { FiCheckCircle, FiEdit } from "react-icons/fi";
 import { AiOutlineDelete, AiOutlineUser } from "react-icons/ai";
 import { RxExit } from "react-icons/rx";
 import { IoMdAdd } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SideMenu from "../../components/SideMenu";
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
+  const navigate = useNavigate();
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openPayExpense, setOpenPayExpense] = useState(false);
@@ -365,7 +366,10 @@ export default function Dashboard() {
 
   const renderReceiveRevenue = () => {
     return (
-      <Modal isOpen={openReceiveRevenue} onClose={() => setOpenReceiveRevenue(false)}>
+      <Modal
+        isOpen={openReceiveRevenue}
+        onClose={() => setOpenReceiveRevenue(false)}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Deseja efetivar esta receita?</ModalHeader>
@@ -401,7 +405,9 @@ export default function Dashboard() {
             <Button colorScheme="green" mr={3}>
               Receber
             </Button>
-            <Button onClick={() => setOpenReceiveRevenue(false)}>Cancelar</Button>
+            <Button onClick={() => setOpenReceiveRevenue(false)}>
+              Cancelar
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -509,7 +515,7 @@ export default function Dashboard() {
         </ModalContent>
       </Modal>
     );
-  }
+  };
 
   return (
     <>
@@ -535,19 +541,17 @@ export default function Dashboard() {
                 </MenuButton>
                 <Portal>
                   <MenuList>
-                    <Link to="/profile">
-                      <MenuItem>
-                        <Icon
-                          as={AiOutlineUser}
-                          w="1rem"
-                          h="1rem"
-                          color="#3182CE"
-                        />
-                        <Text ml="0.5rem" fontSize="1rem">
-                          Meu Perfil
-                        </Text>
-                      </MenuItem>
-                    </Link>
+                    <MenuItem onClick={() => navigate("/profile")}>
+                      <Icon
+                        as={AiOutlineUser}
+                        w="1rem"
+                        h="1rem"
+                        color="#3182CE"
+                      />
+                      <Text ml="0.5rem" fontSize="1rem">
+                        Meu Perfil
+                      </Text>
+                    </MenuItem>
 
                     <MenuItem>
                       <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />

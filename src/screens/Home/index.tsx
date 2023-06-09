@@ -1,10 +1,12 @@
 import { Container, Section } from "./styles";
-import { Button, Text } from '@chakra-ui/react';
+import { Button, Text } from "@chakra-ui/react";
 import money from "../../assets/money.png";
 import Header from "../../components/Header";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <Header />
@@ -19,9 +21,9 @@ export default function Home() {
             sua vida financeira, proporcionando praticidade, eficiência e
             controle total sobre suas finanças pessoais.
           </Text>
-          <Link to="/register">
-            <Button colorScheme="blue">Cadastre-se agora</Button>
-          </Link>
+          <Button onClick={() => navigate("/register")} colorScheme="blue">
+            Cadastre-se agora
+          </Button>
         </div>
 
         <div className="div-image">
