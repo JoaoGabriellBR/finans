@@ -61,10 +61,12 @@ export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
+  const [openPayExpense, setOpenPayExpense] = useState(false);
   const [openEditExpense, setOpenEditExpense] = useState(false);
   const [openDeleteExpense, setOpenDeleteExpense] = useState(false);
 
   const [openNewRevenue, setOpenNewRevenue] = useState(false);
+  const [openReceiveRevenue, setOpenReceiveRevenue] = useState(false);
   const [openEditRevenue, setOpenEditRevenue] = useState(false);
   const [openDeleteRevenue, setOpenDeleteRevenue] = useState(false);
 
@@ -152,6 +154,52 @@ export default function Dashboard() {
               Salvar
             </Button>
             <Button onClick={() => setOpenNewExpense(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
+
+  const renderPayExpense = () => {
+    return (
+      <Modal isOpen={openPayExpense} onClose={() => setOpenPayExpense(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Deseja efetivar esta despesa?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <Text mb="1rem" fontSize="1rem">
+              Ao efetivar essa despesa será descontado o valor na conta.
+            </Text>
+            <FormControl id="currency" mb="2rem">
+              <Input
+                // disabled
+                variant="flushed"
+                type="text"
+                // value={value}
+                value="R$ 31,03"
+                // onChange={handleChangeEditExpense}
+                placeholder="R$ 0,00"
+                _placeholder={{ color: "#f00" }}
+                fontSize="1.5rem"
+                color="#f00"
+              />
+            </FormControl>
+
+            <Input
+              variant="flushed"
+              type="text"
+              placeholder="Descrição"
+              maxLength={500}
+              value="Algar telecom"
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3}>
+              Pagar
+            </Button>
+            <Button onClick={() => setOpenPayExpense(false)}>Cancelar</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -315,6 +363,51 @@ export default function Dashboard() {
     );
   };
 
+  const renderReceiveRevenue = () => {
+    return (
+      <Modal isOpen={openReceiveRevenue} onClose={() => setOpenReceiveRevenue(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Deseja efetivar esta receita?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <Text mb="1rem" fontSize="1rem">
+              Ao efetivar essa receita será adicionado o valor na conta.
+            </Text>
+            <FormControl id="currency" mb="2rem">
+              <Input
+                variant="flushed"
+                type="text"
+                // value={valueEditRevenue}
+                value="R$ 50,00"
+                onChange={handleChangeEditRevenue}
+                placeholder="R$ 0,00"
+                _placeholder={{ color: "green" }}
+                fontSize="1.5rem"
+                color="green"
+              />
+            </FormControl>
+
+            <Input
+              variant="flushed"
+              type="text"
+              placeholder="Descrição"
+              maxLength={500}
+              value="Receita de teste"
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="green" mr={3}>
+              Receber
+            </Button>
+            <Button onClick={() => setOpenReceiveRevenue(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
+
   const renderEditRevenue = () => {
     return (
       <Modal isOpen={openEditRevenue} onClose={() => setOpenEditRevenue(false)}>
@@ -421,11 +514,14 @@ export default function Dashboard() {
   return (
     <>
       {renderNewExpense()}
+      {renderPayExpense()}
       {renderEditExpense()}
+      {renderDeleteExpense()}
+
       {renderNewRevenue()}
+      {renderReceiveRevenue()}
       {renderEditRevenue()}
       {renderDeleteRevenue()}
-      {renderDeleteExpense()}
       <Container>
         <SideMenu />
 
@@ -606,6 +702,7 @@ export default function Dashboard() {
                     <Td>
                       <DivAcoes>
                         <Icon
+                          onClick={() => setOpenPayExpense(true)}
                           cursor="pointer"
                           as={FiCheckCircle}
                           w="1rem"
@@ -679,6 +776,7 @@ export default function Dashboard() {
                     <Td>
                       <DivAcoes>
                         <Icon
+                          onClick={() => setOpenReceiveRevenue(true)}
                           cursor="pointer"
                           as={FiCheckCircle}
                           w="1rem"
