@@ -132,3 +132,11 @@ export const DivSwitch = styled.div`
     align-items: center;
   }
 `;
+
+export const DivDelete = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-top: 2rem;
+`;

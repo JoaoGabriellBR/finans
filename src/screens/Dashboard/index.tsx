@@ -13,6 +13,7 @@ import {
   DivReceitas,
   DivAcoes,
   DivSwitch,
+  DivDelete
 } from "./styles";
 import {
   Menu,
@@ -24,6 +25,7 @@ import {
   Text,
   Icon,
   Button,
+  Box,
   TableContainer,
   Table,
   Thead,
@@ -60,13 +62,16 @@ export default function Dashboard() {
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openEditExpense, setOpenEditExpense] = useState(false);
+  const [openDeleteExpense, setOpenDeleteExpense] = useState(false);
+
   const [openNewRevenue, setOpenNewRevenue] = useState(false);
   const [openEditRevenue, setOpenEditRevenue] = useState(false);
+  const [openDeleteRevenue, setOpenDeleteRevenue] = useState(false);
 
-  const [value, setValue] = useState("");
+  const [valueNewExpense, setValueNewExpense] = useState("");
+  const [valueEditExpense, setValueEditExpense] = useState("");
 
   const [valueNewRevenue, setValueNewRevenue] = useState("");
-  const [valueEditExpense, setValueEditExpense] = useState("");
   const [valueEditRevenue, setValueEditRevenue] = useState("");
 
   const formatCurrency = (value: string) => {
@@ -79,9 +84,9 @@ export default function Dashboard() {
     return formattedValue;
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeNewExpense = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
-    setValue(formatCurrency(inputValue));
+    setValueNewExpense(formatCurrency(inputValue));
   };
 
   const handleChangeNewRevenue = (event: ChangeEvent<HTMLInputElement>) => {
@@ -111,8 +116,8 @@ export default function Dashboard() {
               <Input
                 variant="flushed"
                 type="text"
-                value={value}
-                onChange={handleChange}
+                value={valueNewExpense}
+                onChange={handleChangeNewExpense}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "#f00" }}
                 fontSize="1.5rem"
@@ -203,6 +208,53 @@ export default function Dashboard() {
               Salvar
             </Button>
             <Button onClick={() => setOpenEditExpense(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
+
+  const renderDeleteExpense = () => {
+    return (
+      <Modal
+        isOpen={openDeleteExpense}
+        onClose={() => setOpenDeleteExpense(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Excluir Despesa</ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody pb={6}>
+            <Text fontSize="1rem">
+              Tem certeza que deseja remover essa despesa? Esta ação não poderá
+              ser desfeita!
+            </Text>
+
+            <DivDelete>
+              <Box mb="1rem">
+                <Text fontSize="1rem">Descrição</Text>
+                <Text color="gray" fontSize="1rem">
+                  Algar telecom
+                </Text>
+              </Box>
+
+              <Box>
+                <Text fontSize="1rem">Valor</Text>
+                <Text color="gray" fontSize="1rem">
+                  R$ 31,03
+                </Text>
+              </Box>
+            </DivDelete>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3}>
+              Excluir
+            </Button>
+            <Button onClick={() => setOpenDeleteExpense(false)}>
+              Cancelar
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -319,12 +371,61 @@ export default function Dashboard() {
     );
   };
 
+  const renderDeleteRevenue = () => {
+    return (
+      <Modal
+        isOpen={openDeleteRevenue}
+        onClose={() => setOpenDeleteRevenue(false)}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Excluir Receita</ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody pb={6}>
+            <Text fontSize="1rem">
+              Tem certeza que deseja remover essa receita? Esta ação não poderá
+              ser desfeita!
+            </Text>
+
+            <DivDelete>
+              <Box mb="1rem">
+                <Text fontSize="1rem">Descrição</Text>
+                <Text color="gray" fontSize="1rem">
+                  Receita de teste
+                </Text>
+              </Box>
+
+              <Box>
+                <Text fontSize="1rem">Valor</Text>
+                <Text color="gray" fontSize="1rem">
+                  R$ 50,00
+                </Text>
+              </Box>
+            </DivDelete>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="green" mr={3}>
+              Excluir
+            </Button>
+            <Button onClick={() => setOpenDeleteRevenue(false)}>
+              Cancelar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }
+
   return (
     <>
       {renderNewExpense()}
       {renderEditExpense()}
       {renderNewRevenue()}
       {renderEditRevenue()}
+      {renderDeleteRevenue()}
+      {renderDeleteExpense()}
       <Container>
         <SideMenu />
 
@@ -518,6 +619,7 @@ export default function Dashboard() {
                           h="1rem"
                         />
                         <Icon
+                          onClick={() => setOpenDeleteExpense(true)}
                           cursor="pointer"
                           as={AiOutlineDelete}
                           w="1rem"
@@ -590,6 +692,7 @@ export default function Dashboard() {
                           h="1rem"
                         />
                         <Icon
+                          onClick={() => setOpenDeleteRevenue(true)}
                           cursor="pointer"
                           as={AiOutlineDelete}
                           w="1rem"
