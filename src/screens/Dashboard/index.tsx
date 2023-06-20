@@ -16,6 +16,7 @@ import {
   DivDelete,
 } from "./styles";
 import {
+  Tooltip,
   Menu,
   MenuList,
   MenuItem,
@@ -605,59 +606,74 @@ export default function Dashboard() {
           </Header>
 
           <DivCards>
-            <Card>
-              <CardLeft>
-                <Text fontSize="0.9rem" color="gray">
-                  Saldo atual
-                </Text>
-                <Text fontSize="1.5rem">R$ 680,00</Text>
-              </CardLeft>
+            <Tooltip
+              label="O valor total que você tem em suas contas ativas."
+              aria-label="A tooltip"
+            >
+              <Card>
+                <CardLeft>
+                  <Text fontSize="0.9rem" color="gray">
+                    Saldo atual
+                  </Text>
+                  <Text fontSize="1.5rem">R$ 680,00</Text>
+                </CardLeft>
 
-              <CardRight>
-                <Icon
-                  as={SiStarlingbank}
-                  w="2.5rem"
-                  h="2.5rem"
-                  color="#3182CE"
-                />
-              </CardRight>
-            </Card>
+                <CardRight>
+                  <Icon
+                    as={SiStarlingbank}
+                    w="2.5rem"
+                    h="2.5rem"
+                    color="#3182CE"
+                  />
+                </CardRight>
+              </Card>
+            </Tooltip>
 
-            <Card>
-              <CardLeft>
-                <Text fontSize="0.9rem" color="gray">
-                  Receitas
-                </Text>
-                <Text fontSize="1.5rem">R$ 0,00</Text>
-              </CardLeft>
+            <Tooltip
+              label="O valor total de suas receitas cadastradas, recebidas ou pendentes."
+              aria-label="A tooltip"
+            >
+              <Card>
+                <CardLeft>
+                  <Text fontSize="0.9rem" color="gray">
+                    Receitas
+                  </Text>
+                  <Text fontSize="1.5rem">R$ 0,00</Text>
+                </CardLeft>
 
-              <CardRight>
-                <Icon
-                  as={BsFillArrowUpCircleFill}
-                  w="2.5rem"
-                  h="2.5rem"
-                  color="#4caf50"
-                />
-              </CardRight>
-            </Card>
+                <CardRight>
+                  <Icon
+                    as={BsFillArrowUpCircleFill}
+                    w="2.5rem"
+                    h="2.5rem"
+                    color="#4caf50"
+                  />
+                </CardRight>
+              </Card>
+            </Tooltip>
 
-            <Card>
-              <CardLeft>
-                <Text fontSize="0.9rem" color="gray">
-                  Despesas
-                </Text>
-                <Text fontSize="1.5rem">R$ 0,00</Text>
-              </CardLeft>
+            <Tooltip
+              label="O valor total de suas despesas cadastradas, pagas ou pendentes."
+              aria-label="A tooltip"
+            >
+              <Card>
+                <CardLeft>
+                  <Text fontSize="0.9rem" color="gray">
+                    Despesas
+                  </Text>
+                  <Text fontSize="1.5rem">R$ 0,00</Text>
+                </CardLeft>
 
-              <CardRight>
-                <Icon
-                  as={BsFillArrowDownCircleFill}
-                  w="2.5rem"
-                  h="2.5rem"
-                  color="#f44336"
-                />
-              </CardRight>
-            </Card>
+                <CardRight>
+                  <Icon
+                    as={BsFillArrowDownCircleFill}
+                    w="2.5rem"
+                    h="2.5rem"
+                    color="#f44336"
+                  />
+                </CardRight>
+              </Card>
+            </Tooltip>
           </DivCards>
 
           <DivTitleDespesas>

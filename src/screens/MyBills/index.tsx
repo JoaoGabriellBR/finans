@@ -46,7 +46,9 @@ import { FiMoreHorizontal, FiCheckCircle } from "react-icons/fi";
 
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
+  
   const navigate = useNavigate();
+  const previousPage = -1;
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openNewBill, setOpenNewBill] = useState(false);
@@ -56,6 +58,7 @@ export default function MyBills() {
   const [valueNewExpense, setValueNewExpense] = useState("");
   const [valueNewBill, setValueNewBill] = useState("");
   const [valueEditBill, setValueEditBill] = useState("");
+
 
   const formatCurrency = (value: string) => {
     const numericValue = parseInt(value.replace(/\D/g, ""));
@@ -255,7 +258,7 @@ export default function MyBills() {
           <Header>
             <div className="div-minhas-contas">
               <Icon
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(previousPage)}
                 cursor="pointer"
                 as={AiOutlineLeft}
                 mt="0.25rem"

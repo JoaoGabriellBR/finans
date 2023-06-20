@@ -31,6 +31,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const previousPage = -1;
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -97,7 +99,7 @@ export default function Profile() {
 
         <Section>
           <div className="div-meu-perfil">
-            <Icon onClick={() => navigate(-1)} cursor="pointer" as={AiOutlineLeft} mr="1rem" mt="0.6rem" />
+            <Icon onClick={() => navigate(previousPage)} cursor="pointer" as={AiOutlineLeft} mr="1rem" mt="0.6rem" />
             <Text fontSize="1.5rem">Meu Perfil</Text>
           </div>
 
