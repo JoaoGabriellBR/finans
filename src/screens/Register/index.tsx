@@ -26,14 +26,14 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [loadingRegister, setLoadingRegister] = useState(false);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleCreateUser = async (e) => {
+  const handleCreateUser = async (e: any) => {
     e.preventDefault();
     setLoadingRegister(true);
     try {
@@ -59,16 +59,18 @@ export default function Register() {
         status: "success",
         duration: 2000,
         isClosable: true,
+        position: "top-right",
       });
-      // navigate("/dashboard");
+      navigate("/login");
     } catch (error: any) {
       setLoadingRegister(false);
+      const errorMessage = error?.response?.data?.error;
       toast({
-        title: "Não foi possível criar a conta.",
-        description: error.message,
+        description: errorMessage,
         status: "error",
         duration: 2000,
         isClosable: true,
+        position: "top-right",
       });
     }
   };
@@ -152,7 +154,7 @@ export default function Register() {
             </Button>
 
             <Text fontSize="0.8rem">Já tem uma conta?</Text>
-            <Text onClick={() => navigate("/login")} fontSize="0.8rem">
+            <Text as='b' cursor="pointer" onClick={() => navigate("/login")} fontSize="0.8rem">
               Faça login aqui
             </Text>
           </Form>
