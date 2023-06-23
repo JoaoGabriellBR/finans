@@ -11,18 +11,61 @@ import {
   InputRightElement,
   Input,
   Icon,
+  useToast,
 } from "@chakra-ui/react";
 import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
 import { BiShow, BiHide } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import api from "../../api";
+import Cookies from "js-cookie";
 
 export default function Login() {
   const navigate = useNavigate();
+  const toast = useToast();
 
+  const [loadingLogin, setLoadingLogin] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+    setLoadingLogin(true);
+
+    try {
+      const response = await api({
+        method: "POST",
+        url: "/login",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          email,
+          password,
+        },
+      });
+
+      setLoadingLogin(false);
+      const { token } = response.data;
+      Cookies.set("finans-authtoken", token, { httpOnly: true, secure: true });
+      navigate("/dashboard");
+    } catch (error: any) {
+      setLoadingLogin(false);
+      console.log(error.message);
+      const errorMessage = error?.response?.data?.error;
+      toast({
+        description: errorMessage,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
   };
 
   return (
@@ -45,6 +88,8 @@ export default function Login() {
                   borderColor="gray"
                   type="email"
                   placeholder="exemplo@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </InputGroup>
             </FormControl>
@@ -67,16 +112,26 @@ export default function Login() {
                   borderColor="gray"
                   type={showPassword ? "text" : "password"}
                   placeholder="********"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </InputGroup>
             </FormControl>
 
-            <Button mb="1.5rem" type="submit" width="100%" colorScheme="blue">
-              Cadastrar
+            <Button
+              onClick={handleLogin}
+              disabled={!email || !password}
+              mb="1.5rem"
+              type="submit"
+              width="100%"
+              colorScheme="blue"
+              opacity={!email || !password ? "60%" : "100%"}
+            >
+              {loadingLogin ? "Entrando..." : "Entrar"}
             </Button>
 
             <Text fontSize="0.8rem">Não tem uma conta?</Text>
-            <Text onClick={() => navigate("/register")} fontSize="0.8rem">
+            <Text as='b' cursor="pointer" onClick={() => navigate("/register")} fontSize="0.8rem">
               Cadastre-se aqui
             </Text>
           </Form>
