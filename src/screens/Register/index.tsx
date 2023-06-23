@@ -11,18 +11,66 @@ import {
   InputRightElement,
   Input,
   Icon,
+  useToast,
 } from "@chakra-ui/react";
 import { AiOutlineUser, AiOutlineMail, AiOutlineLock } from "react-icons/ai";
 import { BiShow, BiHide } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import api from "../../api";
 
 export default function Register() {
   const navigate = useNavigate();
+  const toast = useToast();
 
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  
+  const [loadingRegister, setLoadingRegister] = useState(false);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setLoadingRegister(true);
+    try {
+      await api({
+        method: "POST",
+        url: "/user/create",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {
+          name,
+          email,
+          password,
+        },
+      });
+
+      setLoadingRegister(false);
+      setName("");
+      setEmail("");
+      setPassword("");
+      toast({
+        title: "Conta criada com sucesso.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      // navigate("/dashboard");
+    } catch (error: any) {
+      setLoadingRegister(false);
+      toast({
+        title: "Não foi possível criar a conta.",
+        description: error.message,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -45,6 +93,8 @@ export default function Register() {
                   borderColor="gray"
                   type="text"
                   placeholder="José Silva"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </InputGroup>
             </FormControl>
@@ -60,6 +110,8 @@ export default function Register() {
                   borderColor="gray"
                   type="email"
                   placeholder="exemplo@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </InputGroup>
             </FormControl>
@@ -82,12 +134,21 @@ export default function Register() {
                   borderColor="gray"
                   type={showPassword ? "text" : "password"}
                   placeholder="********"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </InputGroup>
             </FormControl>
 
-            <Button mb="1.5rem" type="submit" width="100%" colorScheme="blue">
-              Cadastrar
+            <Button
+              onClick={handleCreateUser}
+              disabled={!name || !email || !password}
+              mb="1.5rem"
+              type="submit"
+              width="100%"
+              colorScheme="blue"
+            >
+              {loadingRegister ? "Cadastrando..." : "Cadastrar"}
             </Button>
 
             <Text fontSize="0.8rem">Já tem uma conta?</Text>
