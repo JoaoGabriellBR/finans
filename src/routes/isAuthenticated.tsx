@@ -1,5 +1,38 @@
+import { useEffect, useState, ComponentType } from "react";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
-const isAuthenticated = () => Cookies.get("authtoken");
+const isAuthenticated = () => !!Cookies.get("finans-authtoken");
 
-export default isAuthenticated;
+interface AuthenticatedRouteProps {
+  component: ComponentType<any>;
+  [key: string]: any;
+}
+
+const AuthenticatedRoute = ({
+  component: Component,
+  ...props
+}: AuthenticatedRouteProps) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      if (!isAuthenticated()) {
+        navigate("/login");
+      } else {
+        setLoading(false);
+      }
+    };
+
+    checkAuthentication();
+  }, [navigate]);
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
+  return <Component {...props} />;
+};
+
+export default AuthenticatedRoute;
