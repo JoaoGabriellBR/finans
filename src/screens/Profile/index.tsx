@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Header, Section } from "./styles";
 import logo from "../../assets/logo.png";
 import {
@@ -17,74 +17,178 @@ import {
   InputGroup,
   Input,
   Button,
+  useToast,
 } from "@chakra-ui/react";
 import {
   AiOutlineUser,
   AiOutlineLeft,
   AiOutlineMail,
   AiOutlineLock,
-  AiFillBank
+  AiFillBank,
 } from "react-icons/ai";
 import { RxExit, RxDashboard } from "react-icons/rx";
 import { BiHide, BiShow } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import api from "../../api";
+
+type UserData = {
+  id?: number;
+  name?: string;
+  email?: string;
+  password?: string;
+};
 
 export default function Profile() {
   const navigate = useNavigate();
   const previousPage = -1;
-  
-  const [showPassword, setShowPassword] = useState(false);
+
+  const toast = useToast();
+
+  const [loadingUpdateUser, setLoadingUpdateUser] = useState(false);
+  const [loadingChangePassword, setLoadingChangePassword] = useState(false);
+
+  const [userData, setUserData] = useState<UserData | undefined>();
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const handleShowPassword = () => setShowPassword(!showPassword);
+  const loadUserData = async () => {
+    const response = await api({
+      method: "GET",
+      url: "/user/me",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: Cookies.get("finans-authtoken"),
+      },
+    });
+
+    setUserData(response.data);
+  };
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const handleShowOldPassword = () => setShowOldPassword(!showOldPassword);
   const handleShowNewPassword = () => setShowNewPassword(!showNewPassword);
+
+  const handleUpdateUser = async () => {
+    setLoadingUpdateUser(true);
+
+    try {
+      await api({
+        method: "PATCH",
+        url: `/user/update/${userData?.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          name: userData?.name,
+          email: userData?.email,
+        },
+      });
+      setLoadingUpdateUser(false);
+      const successMessage = "Usuário atualizado com sucesso";
+      toast({
+        description: successMessage,
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } catch (error: any) {
+      setLoadingUpdateUser(false);
+      const errorMessage = error?.response?.data?.error;
+      toast({
+        description: errorMessage,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setLoadingChangePassword(true);
+
+    try {
+      await api({
+        method: "PATCH",
+        url: `/user/change-password`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          oldPassword,
+          newPassword,
+        },
+      });
+      setLoadingUpdateUser(false);
+      const successMessage = "Senha atualizada com sucesso.";
+      toast({
+        description: successMessage,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } catch (error: any) {
+      setLoadingUpdateUser(false);
+      const errorMessage = error?.response?.data?.error;
+      toast({
+        description: errorMessage,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+  };
 
   return (
     <>
       <Container>
         <Header>
-            <img onClick={() => navigate("/")} className="logo" alt="logo" src={logo} loading="lazy" />
+          <img
+            onClick={() => navigate("/")}
+            className="logo"
+            alt="logo"
+            src={logo}
+            loading="lazy"
+          />
           <Menu>
             <MenuButton>
               <Avatar w={10} h={10} bg="#3182CE" />
             </MenuButton>
             <Portal>
               <MenuList>
-                  <MenuItem onClick={() => navigate("/profile")}>
-                    <Icon
-                      as={AiOutlineUser}
-                      w="1rem"
-                      h="1rem"
-                      color="#3182CE"
-                    />
-                    <Text ml="0.5rem" fontSize="1rem">
-                      Meu Perfil
-                    </Text>
-                  </MenuItem>
+                <MenuItem onClick={() => navigate("/profile")}>
+                  <Icon as={AiOutlineUser} w="1rem" h="1rem" color="#3182CE" />
+                  <Text ml="0.5rem" fontSize="1rem">
+                    Meu Perfil
+                  </Text>
+                </MenuItem>
 
-                  <MenuItem onClick={() => navigate("/dashboard")}>
-                    <Icon
-                      as={RxDashboard}
-                      w="1rem"
-                      h="1rem"
-                      color="#3182CE"
-                    />
-                    <Text ml="0.5rem" fontSize="1rem">
-                      Dashboard
-                    </Text>
-                  </MenuItem>
+                <MenuItem onClick={() => navigate("/dashboard")}>
+                  <Icon as={RxDashboard} w="1rem" h="1rem" color="#3182CE" />
+                  <Text ml="0.5rem" fontSize="1rem">
+                    Dashboard
+                  </Text>
+                </MenuItem>
 
-                  <MenuItem onClick={() => navigate("/my-bills")}>
-                    <Icon
-                      as={AiFillBank}
-                      w="1rem"
-                      h="1rem"
-                      color="#3182CE"
-                    />
-                    <Text ml="0.5rem" fontSize="1rem">
-                      Minhas Contas
-                    </Text>
-                  </MenuItem>
+                <MenuItem onClick={() => navigate("/my-bills")}>
+                  <Icon as={AiFillBank} w="1rem" h="1rem" color="#3182CE" />
+                  <Text ml="0.5rem" fontSize="1rem">
+                    Minhas Contas
+                  </Text>
+                </MenuItem>
 
                 <MenuItem>
                   <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
@@ -99,7 +203,12 @@ export default function Profile() {
 
         <Section>
           <div className="div-meu-perfil">
-            <Icon onClick={() => navigate(previousPage)} cursor="pointer" as={AiOutlineLeft} mr="1rem" mt="0.6rem" />
+            <Icon
+              onClick={() => navigate(previousPage)}
+              cursor="pointer"
+              as={AiOutlineLeft}
+              mr="1rem"
+            />
             <Text fontSize="1.5rem">Meu Perfil</Text>
           </div>
 
@@ -118,6 +227,10 @@ export default function Profile() {
                     borderColor="gray"
                     type="text"
                     placeholder="José Silva"
+                    value={userData?.name}
+                    onChange={(e) =>
+                      setUserData({ ...userData, name: e.target.value })
+                    }
                   />
                 </InputGroup>
               </FormControl>
@@ -133,12 +246,23 @@ export default function Profile() {
                     borderColor="gray"
                     type="email"
                     placeholder="exemplo@gmail.com"
+                    value={userData?.email}
+                    onChange={(e) =>
+                      setUserData({ ...userData, email: e.target.value })
+                    }
                   />
                 </InputGroup>
               </FormControl>
 
-              <Button type="submit" width="100%" colorScheme="blue">
-                Atualizar informações
+              <Button
+                onClick={handleUpdateUser}
+                type="submit"
+                width="100%"
+                colorScheme="blue"
+              >
+                {loadingUpdateUser
+                  ? "Atualizando informações..."
+                  : "Atualizar informações"}
               </Button>
             </div>
           </div>
@@ -152,8 +276,11 @@ export default function Profile() {
                   <InputLeftElement pointerEvents="none">
                     <Icon color="#242424" as={AiOutlineLock} w={5} h={5} />
                   </InputLeftElement>
-                  <InputRightElement width="4rem" onClick={handleShowPassword}>
-                    {showPassword ? (
+                  <InputRightElement
+                    width="4rem"
+                    onClick={handleShowOldPassword}
+                  >
+                    {showOldPassword ? (
                       <Icon as={BiHide} w={5} h={5} />
                     ) : (
                       <Icon as={BiShow} w={5} h={5} />
@@ -162,8 +289,10 @@ export default function Profile() {
                   <Input
                     border="1px"
                     borderColor="gray"
-                    type={showPassword ? "text" : "password"}
+                    type={showOldPassword ? "text" : "password"}
                     placeholder="********"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
                   />
                 </InputGroup>
               </FormControl>
@@ -189,12 +318,19 @@ export default function Profile() {
                     borderColor="gray"
                     type={showNewPassword ? "text" : "password"}
                     placeholder="********"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                   />
                 </InputGroup>
               </FormControl>
 
-              <Button type="submit" width="100%" colorScheme="blue">
-                Alterar senha
+              <Button
+                onClick={handleChangePassword}
+                type="submit"
+                width="100%"
+                colorScheme="blue"
+              >
+                {loadingChangePassword ? "Alterando senha..." : "Alterar senha"}
               </Button>
             </div>
           </div>
