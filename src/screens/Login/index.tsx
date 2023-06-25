@@ -18,6 +18,7 @@ import { BiShow, BiHide } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
 import Cookies from "js-cookie";
+import notification from "../../utils/toast";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -54,13 +55,7 @@ export default function Login() {
       setLoadingLogin(false);
       console.log(error.message);
       const errorMessage = error?.response?.data?.error;
-      toast({
-        description: errorMessage,
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-        position: "top-right",
-      });
+      notification(toast, errorMessage, 'error');
     }
   };
 
