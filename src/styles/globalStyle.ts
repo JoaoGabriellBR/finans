@@ -16,6 +16,6 @@ export const GlobalStyle = createGlobalStyle`
         height: 100vh;
         color: #000;
         background-color: #eee;
-        font-family: Coldec Regular;
+        font-family: Codec Regular;
     }
 `;

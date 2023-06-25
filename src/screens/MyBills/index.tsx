@@ -261,7 +261,6 @@ export default function MyBills() {
                 onClick={() => navigate(previousPage)}
                 cursor="pointer"
                 as={AiOutlineLeft}
-                mt="0.25rem"
                 mr="1rem"
               />
               <Text fontSize="1.5rem">Minhas contas</Text>
