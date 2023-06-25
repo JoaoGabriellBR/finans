@@ -41,19 +41,15 @@ export default function Login() {
       const response = await api({
         method: "POST",
         url: "/login",
-        headers: {
-          "Content-Type": "application/json",
-        },
         data: {
           email,
           password,
         },
       });
-
       setLoadingLogin(false);
       const { token } = response.data;
-      Cookies.set("finans-authtoken", token, { httpOnly: true, secure: true });
-      navigate("/dashboard");
+      Cookies.set("finans-authtoken", token);
+      navigate("/dashboard")
     } catch (error: any) {
       setLoadingLogin(false);
       console.log(error.message);
@@ -125,7 +121,6 @@ export default function Login() {
               type="submit"
               width="100%"
               colorScheme="blue"
-              opacity={!email || !password ? "60%" : "100%"}
             >
               {loadingLogin ? "Entrando..." : "Entrar"}
             </Button>
