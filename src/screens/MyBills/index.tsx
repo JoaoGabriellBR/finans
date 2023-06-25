@@ -43,6 +43,7 @@ import { RxExit } from "react-icons/rx";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { FiMoreHorizontal, FiCheckCircle } from "react-icons/fi";
+import handleLogout from "../../utils/handleLogout";
 
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -284,7 +285,7 @@ export default function MyBills() {
                       </Text>
                     </MenuItem>
 
-                    <MenuItem>
+                    <MenuItem onClick={() => handleLogout(navigate)}>
                       <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
                       <Text ml="0.5rem" fontSize="1rem">
                         Sair

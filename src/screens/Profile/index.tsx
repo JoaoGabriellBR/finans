@@ -29,6 +29,7 @@ import {
 import { RxExit, RxDashboard } from "react-icons/rx";
 import { BiHide, BiShow } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import handleLogout from "../../utils/handleLogout";
 import Cookies from "js-cookie";
 import api from "../../api";
 
@@ -190,7 +191,7 @@ export default function Profile() {
                   </Text>
                 </MenuItem>
 
-                <MenuItem>
+                <MenuItem onClick={() => handleLogout(navigate)}>
                   <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
                   <Text ml="0.5rem" fontSize="1rem">
                     Sair

@@ -57,6 +57,7 @@ import { RxExit } from "react-icons/rx";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import SideMenu from "../../components/SideMenu";
+import handleLogout from "../../utils/handleLogout";
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -554,7 +555,7 @@ export default function Dashboard() {
                       </Text>
                     </MenuItem>
 
-                    <MenuItem>
+                    <MenuItem onClick={() => handleLogout(navigate)}>
                       <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
                       <Text ml="0.5rem" fontSize="1rem">
                         Sair

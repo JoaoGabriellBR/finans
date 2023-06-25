@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { AiOutlineUser, AiFillBank } from "react-icons/ai";
 import { RxExit, RxDashboard } from "react-icons/rx";
 import logo from "../../assets/logo.png";
+import handleLogout from "../../utils/handleLogout";
 
 export default function SideMenu() {
   const navigate = useNavigate();
@@ -93,7 +94,7 @@ export default function SideMenu() {
                     </Text>
                   </MenuItem>
 
-                  <MenuItem>
+                  <MenuItem onClick={() => handleLogout(navigate)}>
                     <Icon as={RxExit} w="1rem" h="1rem" color="#3182CE" />
                     <Text ml="0.5rem" fontSize="1rem">
                       Sair
