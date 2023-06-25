@@ -1,9 +1,4 @@
-import {
-  BrowserRouter,
-  Navigate,
-  Routes as Rotas,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter, Routes as Rotas, Route } from "react-router-dom";
 import Home from "../screens/Home";
 import Register from "../screens/Register";
 import Login from "../screens/Login";
@@ -11,7 +6,7 @@ import Dashboard from "../screens/Dashboard";
 import Profile from "../screens/Profile";
 import MyBills from "../screens/MyBills";
 
-import isAuthenticated from "./isAuthenticated";
+import AuthenticatedRoute from "./isAuthenticated";
 
 export default function Routes() {
   return (
@@ -22,16 +17,16 @@ export default function Routes() {
         <Route path="/login" element={<Login />}></Route>
         <Route
           path="/dashboard"
-          element={isAuthenticated() ? <Dashboard /> : <Navigate to="/login" />}
-        ></Route>
+          element={<AuthenticatedRoute component={Dashboard} />}
+        />
         <Route
           path="/profile"
-          element={isAuthenticated() ? <Profile /> : <Navigate to="/login" />}
-        ></Route>
+          element={<AuthenticatedRoute component={Profile} />}
+        />
         <Route
           path="/my-bills"
-          element={isAuthenticated() ? <MyBills /> : <Navigate to="/login" />}
-        ></Route>
+          element={<AuthenticatedRoute component={MyBills} />}
+        />
       </Rotas>
     </BrowserRouter>
   );
