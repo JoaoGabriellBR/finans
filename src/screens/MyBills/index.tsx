@@ -50,11 +50,11 @@ import api from "../../api";
 import notification from "../../utils/toast";
 import { formatCurrency, getNumericValue } from "../../utils/formatCurrency";
 
-type BillData = {
+interface BillData {
   id: number;
-  balance: number;
   description: string;
-}[];
+  balance: number;
+}
 
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -63,7 +63,7 @@ export default function MyBills() {
   const navigate = useNavigate();
   const previousPage = -1;
 
-  const [billData, setBillData] = useState<BillData>();
+  const [billData, setBillData] = useState<BillData[]>([]);
   const [billId, setBillId] = useState();
 
   const [loadingNewBill, setLoadingNewBill] = useState(false);
@@ -224,7 +224,7 @@ export default function MyBills() {
       <Modal isOpen={openEditBill} onClose={() => setOpenEditBill(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Editar Conta</ModalHeader>
+          <ModalHeader>Editar Conta </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <FormControl id="currency" mb="2rem">
@@ -235,7 +235,7 @@ export default function MyBills() {
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
                 color="#00f"
-                value={billData?.balance}
+                value={billData[0]?.balance}
                 onChange={handleChangeBalanceEditBill}
               />
             </FormControl>
@@ -245,8 +245,12 @@ export default function MyBills() {
               type="text"
               placeholder="Descrição"
               maxLength={500}
-              value={billData?.description}
-              onChange={(e) => setBillData({ ...billData, description: e.target.value })}
+              value={billData[0]?.description}
+              onChange={(e) => {
+                const updatedBillData = [...billData];
+                updatedBillData[0].description = e.target.value;
+                setBillData(updatedBillData);
+              }}
             />
           </ModalBody>
 
@@ -424,7 +428,7 @@ export default function MyBills() {
                         <MenuItem
                           onClick={() => {
                             setOpenDeleteBill(true);
-                            setBillId(bill.id);
+                            setBillId(bill?.id);
                           }}
                         >
                           <Icon as={AiOutlineDelete} mr="1rem" />
