@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import SideMenu from "../../components/SideMenu";
 import {
   Container,
@@ -31,6 +31,7 @@ import {
   ModalCloseButton,
   ModalOverlay,
   useMediaQuery,
+  useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -44,12 +45,29 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { FiMoreHorizontal, FiCheckCircle } from "react-icons/fi";
 import handleLogout from "../../utils/handleLogout";
+import Cookies from "js-cookie";
+import api from "../../api";
+import notification from "../../utils/toast";
+import {formatCurrency, getNumericValue} from "../../utils/formatCurrency";
+
+type BillData = {
+  id: number;
+  value: number;
+  description: string;
+}[]
 
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
-  
+  const toast = useToast();
+
   const navigate = useNavigate();
   const previousPage = -1;
+
+  const [billData, setBillData] = useState<BillData>();
+  const [billId, setBillId] = useState();
+
+  const [loadingNewBill, setLoadingNewBill] = useState(false);
+  const [loadingDeleteBill, setLoadingDeleteBill] = useState(false);
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openNewBill, setOpenNewBill] = useState(false);
@@ -57,34 +75,109 @@ export default function MyBills() {
   const [openDeleteBill, setOpenDeleteBill] = useState(false);
 
   const [valueNewExpense, setValueNewExpense] = useState("");
+
   const [valueNewBill, setValueNewBill] = useState("");
   const [valueEditBill, setValueEditBill] = useState("");
 
+  const [descriptionNewBill, setDescriptionNewBill] = useState('');
+  const [descriptionEditBill, setDescriptionEditBill] = useState('');
 
-  const formatCurrency = (value: string) => {
-    const numericValue = parseInt(value.replace(/\D/g, ""));
-    const formattedValue = (numericValue / 100).toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-
-    return formattedValue;
+  const loadData = async () => {
+    try {
+      const response = await api({
+        method: "GET",
+        url: "/bill/get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setBillData(response?.data?.response);
+      console.log(billData);
+    } catch (e) {
+      const errorMessage = "Não foi possível carregar os dados.";
+      notification(toast, errorMessage, "error");
+    }
   };
 
-  const handleChangeNewBill = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setValueNewBill(formatCurrency(inputValue));
+  useEffect(() => {
+    loadData();
+  }, [])
+
+  const handleChangeValueNewBill = (e: ChangeEvent<HTMLInputElement>) => {
+    setValueNewBill(formatCurrency(e.target.value));
   };
 
-  const handleChangeEditBill = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
+  const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
+    setDescriptionNewBill(e.target.value);
+  };
+
+  const handleChangeEditBill = (e: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
     setValueEditBill(formatCurrency(inputValue));
   };
 
-  const handleChangeNewExpense = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
+  const handleChangeNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
     setValueNewExpense(formatCurrency(inputValue));
   };
+
+  const handleNewBill = async () => {
+    setLoadingNewBill(true);
+    try {
+      const numericValue = getNumericValue(valueNewBill);
+      await api({
+        method: "POST",
+        url: "/bill/create",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          value: numericValue,
+          description: descriptionNewBill,
+        },
+      });
+
+      setLoadingNewBill(false);
+      setOpenNewBill(false);
+      loadData();
+      const successMessage = "Conta criada com sucesso.";
+      notification(toast, successMessage, "success");
+
+    } catch (error: any) {
+      setLoadingNewBill(false);
+      setOpenNewBill(false);
+      const errorMessage = error?.response?.data?.error;
+      notification(toast, errorMessage, "error");
+    }
+  };
+
+  const handleDeleteBill = async () => {
+    try{
+      await api({
+        method: "PATCH",
+        url: `/bill/delete/${billId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+
+      setLoadingDeleteBill(false);
+      setOpenDeleteBill(false);
+      loadData();
+
+      const successMessage = "Conta excluída com sucesso.";
+      notification(toast, successMessage, "success");
+
+    }catch(error: any){
+      setLoadingDeleteBill(false);
+      setOpenDeleteBill(false);
+      const errorMessage = error?.response?.data?.error || "Não foi possível excluir a conta.";
+      notification(toast, errorMessage, "error");
+    }
+  }
 
   const renderNewBill = () => {
     return (
@@ -98,12 +191,12 @@ export default function MyBills() {
               <Input
                 variant="flushed"
                 type="text"
-                value={valueNewBill}
-                onChange={handleChangeNewBill}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
                 color="#00f"
+                value={valueNewBill}
+                onChange={handleChangeValueNewBill}
               />
             </FormControl>
 
@@ -112,12 +205,14 @@ export default function MyBills() {
               type="text"
               placeholder="Descrição"
               maxLength={500}
+              value={descriptionNewBill}
+              onChange={handleChangeDescriptionNewBill}
             />
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3}>
-              Salvar
+            <Button onClick={handleNewBill} colorScheme="blue" mr={3}>
+              {loadingNewBill ? "Salvando..." : "Salvar"}
             </Button>
             <Button onClick={() => setOpenNewBill(false)}>Cancelar</Button>
           </ModalFooter>
@@ -138,9 +233,6 @@ export default function MyBills() {
               <Input
                 variant="flushed"
                 type="text"
-                // value={valueEditBill}
-                value="R$ 500,00"
-                onChange={handleChangeEditBill}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
@@ -183,7 +275,7 @@ export default function MyBills() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="red" mr={3}>
+            <Button onClick={handleDeleteBill} colorScheme="red" mr={3}>
               Excluir
             </Button>
             <Button onClick={() => setOpenDeleteBill(false)}>Cancelar</Button>
@@ -303,55 +395,67 @@ export default function MyBills() {
               <Text fontSize="1.5rem">Nova conta</Text>
             </CardNovaConta>
 
-            <CardContas>
-              <Box className="div-nome-conta" mb="2rem">
-                <div className="div-carteira">
-                  <Icon as={FaMoneyCheckAlt} h={5} w={5} mr="1rem" />
-                  <Text fontSize="1.5rem">Carteira</Text>
-                </div>
+            {billData?.map((bill: any) => (
+              <CardContas>
+                <Box className="div-nome-conta" mb="2rem">
+                  <div className="div-carteira">
+                    <Icon as={FaMoneyCheckAlt} h={5} w={5} mr="1rem" />
+                    <Text fontSize="1.5rem">{bill.description}</Text>
+                  </div>
 
-                <Menu>
-                  <MenuButton>
-                    <Icon cursor="pointer" as={FiMoreHorizontal} h={5} w={5} />
-                  </MenuButton>
+                  <Menu>
+                    <MenuButton>
+                      <Icon
+                        cursor="pointer"
+                        as={FiMoreHorizontal}
+                        h={5}
+                        w={5}
+                      />
+                    </MenuButton>
 
-                  <Portal>
-                    <MenuList>
-                      <MenuItem onClick={() => setOpenEditBill(true)}>
-                        <Icon as={AiOutlineEdit} mr="1rem" />
-                        Editar
-                      </MenuItem>
-                      <MenuItem onClick={() => setOpenDeleteBill(true)}>
-                        <Icon as={AiOutlineDelete} mr="1rem" />
-                        Excluir
-                      </MenuItem>
-                    </MenuList>
-                  </Portal>
-                </Menu>
-              </Box>
+                    <Portal>
+                      <MenuList>
+                        <MenuItem onClick={() => setOpenEditBill(true)}>
+                          <Icon as={AiOutlineEdit} mr="1rem" />
+                          Editar
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            setOpenDeleteBill(true);
+                            setBillId(bill.id);
+                          }}
+                        >
+                          <Icon as={AiOutlineDelete} mr="1rem" />
+                          Excluir
+                        </MenuItem>
+                      </MenuList>
+                    </Portal>
+                  </Menu>
+                </Box>
 
-              <Box className="div-saldo-atual" mb="1rem">
-                <Text fontSize="0.9rem">Saldo atual</Text>
-                <Text as="b" color="green" fontSize="0.9rem">
-                  R$ 500,00
-                </Text>
-              </Box>
+                <Box className="div-saldo-atual" mb="1rem">
+                  <Text fontSize="0.9rem">Saldo atual</Text>
+                  <Text as="b" color="green" fontSize="0.9rem">
+                    R$ {bill?.value}
+                  </Text>
+                </Box>
 
-              <Box className="div-saldo-previsto" mb="2rem">
-                <Text fontSize="0.9rem">Saldo previsto</Text>
-                <Text as="b" color="green" fontSize="0.9rem">
-                  R$ 500,00
-                </Text>
-              </Box>
+                <Box className="div-saldo-previsto" mb="2rem">
+                  <Text fontSize="0.9rem">Saldo previsto</Text>
+                  <Text as="b" color="green" fontSize="0.9rem">
+                    R$ 500,00
+                  </Text>
+                </Box>
 
-              <Button
-                onClick={() => setOpenNewExpense(true)}
-                alignSelf="flex-end"
-                variant="ghost"
-              >
-                Adicionar despesa
-              </Button>
-            </CardContas>
+                <Button
+                  onClick={() => setOpenNewExpense(true)}
+                  alignSelf="flex-end"
+                  variant="ghost"
+                >
+                  Adicionar despesa
+                </Button>
+              </CardContas>
+            ))}
           </DivCards>
         </RightBox>
       </Container>
