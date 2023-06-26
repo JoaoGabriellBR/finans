@@ -48,13 +48,13 @@ import handleLogout from "../../utils/handleLogout";
 import Cookies from "js-cookie";
 import api from "../../api";
 import notification from "../../utils/toast";
-import {formatCurrency, getNumericValue} from "../../utils/formatCurrency";
+import { formatCurrency, getNumericValue } from "../../utils/formatCurrency";
 
 type BillData = {
   id: number;
-  value: number;
+  balance: number;
   description: string;
-}[]
+}[];
 
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -74,13 +74,13 @@ export default function MyBills() {
   const [openEditBill, setOpenEditBill] = useState(false);
   const [openDeleteBill, setOpenDeleteBill] = useState(false);
 
-  const [valueNewExpense, setValueNewExpense] = useState("");
+  const [balanceNewExpense, setBalanceNewExpense] = useState("");
 
-  const [valueNewBill, setValueNewBill] = useState("");
-  const [valueEditBill, setValueEditBill] = useState("");
+  const [balanceNewBill, setBalanceNewBill] = useState("");
+  const [balanceEditBill, setBalanceEditBill] = useState("");
 
-  const [descriptionNewBill, setDescriptionNewBill] = useState('');
-  const [descriptionEditBill, setDescriptionEditBill] = useState('');
+  const [descriptionNewBill, setDescriptionNewBill] = useState("");
+  const [descriptionEditBill, setDescriptionEditBill] = useState("");
 
   const loadData = async () => {
     try {
@@ -102,30 +102,29 @@ export default function MyBills() {
 
   useEffect(() => {
     loadData();
-  }, [])
+  }, []);
 
-  const handleChangeValueNewBill = (e: ChangeEvent<HTMLInputElement>) => {
-    setValueNewBill(formatCurrency(e.target.value));
+  const handleChangeBalanceNewBill = (e: ChangeEvent<HTMLInputElement>) => {
+    setBalanceNewBill(formatCurrency(e.target.value));
   };
 
   const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
     setDescriptionNewBill(e.target.value);
   };
 
-  const handleChangeEditBill = (e: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setValueEditBill(formatCurrency(inputValue));
+  const handleChangeBalanceEditBill = (e: ChangeEvent<HTMLInputElement>) => {
+    setBalanceNewBill(formatCurrency(e.target.value));
   };
 
   const handleChangeNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    setValueNewExpense(formatCurrency(inputValue));
+    setBalanceNewExpense(formatCurrency(inputValue));
   };
 
   const handleNewBill = async () => {
     setLoadingNewBill(true);
     try {
-      const numericValue = getNumericValue(valueNewBill);
+      const numericValue = getNumericValue(balanceNewBill);
       await api({
         method: "POST",
         url: "/bill/create",
@@ -134,7 +133,7 @@ export default function MyBills() {
           Authorization: Cookies.get("finans-authtoken"),
         },
         data: {
-          value: numericValue,
+          balance: numericValue,
           description: descriptionNewBill,
         },
       });
@@ -144,7 +143,6 @@ export default function MyBills() {
       loadData();
       const successMessage = "Conta criada com sucesso.";
       notification(toast, successMessage, "success");
-
     } catch (error: any) {
       setLoadingNewBill(false);
       setOpenNewBill(false);
@@ -154,7 +152,7 @@ export default function MyBills() {
   };
 
   const handleDeleteBill = async () => {
-    try{
+    try {
       await api({
         method: "PATCH",
         url: `/bill/delete/${billId}`,
@@ -170,14 +168,14 @@ export default function MyBills() {
 
       const successMessage = "Conta excluída com sucesso.";
       notification(toast, successMessage, "success");
-
-    }catch(error: any){
+    } catch (error: any) {
       setLoadingDeleteBill(false);
       setOpenDeleteBill(false);
-      const errorMessage = error?.response?.data?.error || "Não foi possível excluir a conta.";
+      const errorMessage =
+        error?.response?.data?.error || "Não foi possível excluir a conta.";
       notification(toast, errorMessage, "error");
     }
-  }
+  };
 
   const renderNewBill = () => {
     return (
@@ -195,8 +193,8 @@ export default function MyBills() {
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
                 color="#00f"
-                value={valueNewBill}
-                onChange={handleChangeValueNewBill}
+                value={balanceNewBill}
+                onChange={handleChangeBalanceNewBill}
               />
             </FormControl>
 
@@ -237,6 +235,8 @@ export default function MyBills() {
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
                 color="#00f"
+                value={billData?.balance}
+                onChange={handleChangeBalanceEditBill}
               />
             </FormControl>
 
@@ -244,8 +244,9 @@ export default function MyBills() {
               variant="flushed"
               type="text"
               placeholder="Descrição"
-              value="Carteira"
               maxLength={500}
+              value={billData?.description}
+              onChange={(e) => setBillData({ ...billData, description: e.target.value })}
             />
           </ModalBody>
 
@@ -258,7 +259,7 @@ export default function MyBills() {
         </ModalContent>
       </Modal>
     );
-  }
+  };
 
   const renderDeleteBill = () => {
     return (
@@ -270,7 +271,8 @@ export default function MyBills() {
 
           <ModalBody pb={6}>
             <Text fontSize="1rem">
-              Tem certeza que deseja remover essa conta?  Esta ação não poderá ser desfeita!
+              Tem certeza que deseja remover essa conta? Esta ação não poderá
+              ser desfeita!
             </Text>
           </ModalBody>
 
@@ -283,7 +285,7 @@ export default function MyBills() {
         </ModalContent>
       </Modal>
     );
-  }
+  };
 
   const renderNewExpense = () => {
     return (
@@ -297,7 +299,7 @@ export default function MyBills() {
               <Input
                 variant="flushed"
                 type="text"
-                value={valueNewExpense}
+                value={balanceNewExpense}
                 onChange={handleChangeNewExpense}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "#f00" }}
@@ -436,7 +438,7 @@ export default function MyBills() {
                 <Box className="div-saldo-atual" mb="1rem">
                   <Text fontSize="0.9rem">Saldo atual</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
-                    R$ {bill?.value}
+                    R$ {bill?.balance}
                   </Text>
                 </Box>
 
