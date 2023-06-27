@@ -201,7 +201,7 @@ export default function MyBills() {
             <Input
               variant="flushed"
               type="text"
-              placeholder="Descrição"
+              placeholder="Descrição (max 50 caracteres)"
               maxLength={500}
               value={descriptionNewBill}
               onChange={handleChangeDescriptionNewBill}
@@ -243,7 +243,7 @@ export default function MyBills() {
             <Input
               variant="flushed"
               type="text"
-              placeholder="Descrição"
+              placeholder="Descrição (max 50 caracteres)"
               maxLength={500}
               value={billData[0]?.description}
               onChange={(e) => {
@@ -315,7 +315,7 @@ export default function MyBills() {
             <Input
               variant="flushed"
               type="text"
-              placeholder="Descrição"
+              placeholder="Descrição (max 50 caracteres)"
               maxLength={500}
             />
 
@@ -406,7 +406,11 @@ export default function MyBills() {
                 <Box className="div-nome-conta" mb="2rem">
                   <div className="div-carteira">
                     <Icon as={FaMoneyCheckAlt} h={5} w={5} mr="1rem" />
-                    <Text fontSize="1.5rem">{bill.description}</Text>
+                    <Text fontSize="1.5rem">
+                      {bill.description.length >= 20
+                        ? bill.description.slice(0, 15) + '...'
+                        : bill.description}
+                    </Text>
                   </div>
 
                   <Menu>
