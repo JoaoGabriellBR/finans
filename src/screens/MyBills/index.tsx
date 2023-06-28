@@ -202,7 +202,7 @@ export default function MyBills() {
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
                 color="#00f"
-                value={balanceNewBill}
+                value={`R$ ${balanceNewBill}`}
                 onChange={handleChangeBalanceNewBill}
               />
             </FormControl>
@@ -244,7 +244,7 @@ export default function MyBills() {
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
                 color="#00f"
-                value={billDataUpdate.balance}
+                value={`R$ ${billDataUpdate.balance}`}
                 onChange={(e) => {
                   setBillDataUpdate((prevBillData) => ({
                     ...prevBillData,

@@ -2,7 +2,7 @@ export const formatCurrency = (value: any) => {
   const numericValue = parseInt(value.replace(/\D/g, ""));
 
   const formattedValue = (numericValue / 100).toLocaleString("pt-BR", {
-    style: "currency",
+    // style: "currency",
     currency: "BRL",
   });
 
