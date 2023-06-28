@@ -64,6 +64,7 @@ export default function MyBills() {
   const previousPage = -1;
 
   const [billData, setBillData] = useState<BillData[]>([]);
+  const [billDataUpdate, setBillDataUpdate]= useState([]);
   const [billId, setBillId] = useState();
 
   const [loadingNewBill, setLoadingNewBill] = useState(false);
@@ -113,7 +114,15 @@ export default function MyBills() {
   };
 
   const handleChangeBalanceEditBill = (e: ChangeEvent<HTMLInputElement>) => {
-    setBalanceNewBill(formatCurrency(e.target.value));
+    const updatedBillData = { ...billDataUpdate };
+    updatedBillData.balance = formatCurrency(e.target.value);
+    setBillData(updatedBillData);
+  };
+
+  const handleChangeDescriptionEditBill = (e: ChangeEvent<HTMLInputElement>) => {
+    const updatedBillData = { ...billDataUpdate };
+    updatedBillData.description = e.target.value;
+    setBillData(updatedBillData);
   };
 
   const handleChangeNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
@@ -235,8 +244,13 @@ export default function MyBills() {
                 _placeholder={{ color: "#00f" }}
                 fontSize="1.5rem"
                 color="#00f"
-                value={billData[0]?.balance}
-                onChange={handleChangeBalanceEditBill}
+                value={billDataUpdate.balance}
+                onChange={(e) => {
+                  setBillDataUpdate((prevBillData) => ({
+                    ...prevBillData,
+                    balance: formatCurrency(e.target.value),
+                  }));
+                }}
               />
             </FormControl>
 
@@ -245,11 +259,12 @@ export default function MyBills() {
               type="text"
               placeholder="Descrição (max 50 caracteres)"
               maxLength={500}
-              value={billData[0]?.description}
+              value={billDataUpdate.description}
               onChange={(e) => {
-                const updatedBillData = [...billData];
-                updatedBillData[0].description = e.target.value;
-                setBillData(updatedBillData);
+                setBillDataUpdate((prevBillData) => ({
+                  ...prevBillData,
+                  description: e.target.value,
+                }));
               }}
             />
           </ModalBody>
@@ -401,14 +416,14 @@ export default function MyBills() {
               <Text fontSize="1.5rem">Nova conta</Text>
             </CardNovaConta>
 
-            {billData?.map((bill: any) => (
+            {billData?.map((bill: any, index: number) => (
               <CardContas>
                 <Box className="div-nome-conta" mb="2rem">
                   <div className="div-carteira">
                     <Icon as={FaMoneyCheckAlt} h={5} w={5} mr="1rem" />
                     <Text fontSize="1.5rem">
                       {bill.description.length >= 20
-                        ? bill.description.slice(0, 15) + '...'
+                        ? bill.description.slice(0, 15) + "..."
                         : bill.description}
                     </Text>
                   </div>
@@ -425,7 +440,13 @@ export default function MyBills() {
 
                     <Portal>
                       <MenuList>
-                        <MenuItem onClick={() => setOpenEditBill(true)}>
+                        <MenuItem
+                          onClick={() => {
+                            setOpenEditBill(true);
+                            setBillDataUpdate(bill);
+                            console.log(billDataUpdate)
+                          }}
+                        >
                           <Icon as={AiOutlineEdit} mr="1rem" />
                           Editar
                         </MenuItem>
