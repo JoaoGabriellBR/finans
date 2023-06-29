@@ -11,7 +11,7 @@ export const formatCurrency = (value: any) => {
 
 export const getNumericValue = (formattedValue: string) => {
   const numericValue = parseFloat(
-    formattedValue.replace(/[^0-9,-]+/g, "").replace(",", ".")
+    formattedValue?.replace(/[^0-9,-]+/g, "").replace(",", ".")
   );
   return numericValue;
 };

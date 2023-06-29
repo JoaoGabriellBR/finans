@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, ChangeEventHandler } from "react";
 import {
   Container,
   RightBox,
@@ -37,6 +37,7 @@ import {
   FormControl,
   Input,
   Switch,
+  Select,
   Modal,
   ModalHeader,
   ModalBody,
@@ -45,6 +46,7 @@ import {
   ModalCloseButton,
   ModalOverlay,
   useMediaQuery,
+  useToast,
 } from "@chakra-ui/react";
 import { SiStarlingbank } from "react-icons/si";
 import {
@@ -58,10 +60,37 @@ import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import SideMenu from "../../components/SideMenu";
 import handleLogout from "../../utils/handleLogout";
+import notification from "../../utils/toast";
+import { formatCurrency, getNumericValue } from "../../utils/formatCurrency";
+import api from "../../api";
+import Cookies from "js-cookie";
+import moment from "moment";
+
+type BillData = {
+  id: number;
+  description: string;
+};
+
+type ExpenseData = {
+  id: number;
+  description: string;
+  balance: number;
+  status: boolean;
+  created_at: number;
+};
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
   const navigate = useNavigate();
+  const toast = useToast();
+
+  const [loadingNewExpense, setLoadingNewExpense] = useState(false);
+  const [loadingNewRevenue, setLoadingNewRevenue] = useState(false);
+
+  const [billData, setBillData] = useState<BillData[]>([]);
+  const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
+  const [billId, setBillId] = useState();
+  const [selectedBill, setSelectedBill] = useState<string>("");
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openPayExpense, setOpenPayExpense] = useState(false);
@@ -73,40 +102,127 @@ export default function Dashboard() {
   const [openEditRevenue, setOpenEditRevenue] = useState(false);
   const [openDeleteRevenue, setOpenDeleteRevenue] = useState(false);
 
-  const [valueNewExpense, setValueNewExpense] = useState("");
-  const [valueEditExpense, setValueEditExpense] = useState("");
+  const [balanceNewExpense, setBalanceNewExpense] = useState('');
+  const [balanceEditExpense, setBalanceEditExpense] = useState('');
 
-  const [valueNewRevenue, setValueNewRevenue] = useState("");
-  const [valueEditRevenue, setValueEditRevenue] = useState("");
+  const [descriptionNewExpense, setDescriptionNewExpense] = useState('');
+  const [descriptionEditExpense, setDescriptionEditExpense] = useState('');
 
-  const formatCurrency = (value: string) => {
-    const numericValue = parseInt(value.replace(/\D/g, ""));
-    const formattedValue = (numericValue / 100).toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
+  const [statusNewExpense, setStatusNewExpense] = useState(Boolean);
+  const [statusEditExpense, setStatusEditExpense] = useState(Boolean);
 
-    return formattedValue;
+  const [balanceNewRevenue, setBalanceNewRevenue] = useState('');
+  const [balanceEditRevenue, setBalanceEditRevenue] = useState('');
+
+  const [descriptionNewRevenue, setDescriptionNewRevenue] = useState('');
+  const [descriptionEditRevenue, setDescriptionEditRevenue] = useState('');
+
+  const [statusNewRevenue, setStatusNewRevenue] = useState(Boolean);
+  const [statusEditRevenue, setStatusEditRevenue] = useState(Boolean);
+
+  const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
+
+  const loadData = async () => {
+    try {
+      const response = await api({
+        method: "GET",
+        url: "/expense/get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setExpenseData(response?.data?.response);
+    } catch (e) {
+      const errorMessage = "Não foi possível carregar os dados.";
+      notification(toast, errorMessage, "error");
+    }
   };
 
-  const handleChangeNewExpense = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setValueNewExpense(formatCurrency(inputValue));
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadBillData = async () => {
+    try {
+      const response = await api({
+        method: "GET",
+        url: "/bill/get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setBillData(response?.data?.response);
+    } catch (e) {
+      const errorMessage = "Não foi possível carregar os dados.";
+      notification(toast, errorMessage, "error");
+    }
   };
 
-  const handleChangeNewRevenue = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setValueNewRevenue(formatCurrency(inputValue));
+  useEffect(() => {
+    loadBillData();
+  }, []);
+
+  const calculateTotalBalanceExpense = () => {
+    const sum = expenseData.reduce((accumulator, expense) => {
+      if (expense.status === true) {
+        return accumulator + expense.balance;
+      }
+      return accumulator;
+    }, 0);
+    setTotalBalanceExpense(sum);
+  };
+  
+  // Chamada da função para calcular o total inicialmente
+  useEffect(() => {
+    calculateTotalBalanceExpense();
+  }, []);
+
+  const handleChangeBalanceNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
+    setBalanceNewExpense(formatCurrency(e.target.value));
   };
 
-  const handleChangeEditExpense = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setValueEditExpense(formatCurrency(inputValue));
+  const handleChangeDescriptionNewExpense = (
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    setDescriptionNewExpense(e.target.value);
   };
 
-  const handleChangeEditRevenue = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setValueEditRevenue(formatCurrency(inputValue));
+  const handleChangeStatusNewExpense = (e: any) => {
+    setStatusNewExpense(e.target.value);
+  };
+
+  const handleNewExpense = async () => {
+    setLoadingNewExpense(true);
+    try {
+      const numericValue = getNumericValue(balanceNewExpense);
+      await api({
+        method: "POST",
+        url: "/expense/create",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          id_bill: selectedBill,
+          balance: numericValue,
+          description: descriptionNewExpense,
+          status: statusNewExpense,
+        },
+      });
+
+      setLoadingNewExpense(false);
+      setOpenNewExpense(false);
+      loadData();
+      const successMessage = "Despesa criada com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingNewExpense(false);
+      setOpenNewExpense(false);
+      const errorMessage = error?.response?.data?.error;
+      notification(toast, errorMessage, "error");
+    }
   };
 
   const renderNewExpense = () => {
@@ -117,25 +233,42 @@ export default function Dashboard() {
           <ModalHeader>Nova Despesa</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl id="currency" mb="2rem">
+            <FormControl id="currency" mb="1.5rem">
               <Input
                 variant="flushed"
                 type="text"
-                value={valueNewExpense}
-                onChange={handleChangeNewExpense}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "#f00" }}
                 fontSize="1.5rem"
                 color="#f00"
+                value={`R$ ${balanceNewExpense}`}
+                onChange={handleChangeBalanceNewExpense}
               />
             </FormControl>
 
             <Input
+              mb="1.5rem"
               variant="flushed"
               type="text"
               placeholder="Descrição"
               maxLength={500}
+              value={descriptionNewExpense}
+              onChange={handleChangeDescriptionNewExpense}
             />
+
+            <Select
+              mb="1.5rem"
+              variant="flushed"
+              placeholder="Selecione uma conta"
+              value={selectedBill}
+              onChange={(e) => setSelectedBill(e.target.value)}
+            >
+              {billData.map((bill: BillData) => (
+                <option key={bill.id} value={bill.id}>
+                  {bill.description}
+                </option>
+              ))}
+            </Select>
 
             <DivSwitch>
               <div className="div-switch-icon">
@@ -148,13 +281,17 @@ export default function Dashboard() {
                 />
                 <Text fontSize="1rem">Não foi paga</Text>
               </div>
-              <Switch colorScheme="red" />
+              <Switch
+                isChecked={statusNewExpense}
+                onChange={() => setStatusNewExpense(!statusNewExpense)}
+                colorScheme="red"
+              />
             </DivSwitch>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="red" mr={3}>
-              Salvar
+            <Button onClick={handleNewExpense} colorScheme="red" mr={3}>
+              {loadingNewExpense ? "Salvando..." : "Salvar"}
             </Button>
             <Button onClick={() => setOpenNewExpense(false)}>Cancelar</Button>
           </ModalFooter>
@@ -221,9 +358,6 @@ export default function Dashboard() {
               <Input
                 variant="flushed"
                 type="text"
-                // value={value}
-                value="R$ 31,03"
-                onChange={handleChangeEditExpense}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "#f00" }}
                 fontSize="1.5rem"
@@ -324,8 +458,6 @@ export default function Dashboard() {
               <Input
                 variant="flushed"
                 type="text"
-                value={valueNewRevenue}
-                onChange={handleChangeNewRevenue}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "green" }}
                 fontSize="1.5rem"
@@ -384,9 +516,6 @@ export default function Dashboard() {
               <Input
                 variant="flushed"
                 type="text"
-                // value={valueEditRevenue}
-                value="R$ 50,00"
-                onChange={handleChangeEditRevenue}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "green" }}
                 fontSize="1.5rem"
@@ -428,9 +557,6 @@ export default function Dashboard() {
               <Input
                 variant="flushed"
                 type="text"
-                // value={valueEditRevenue}
-                value="R$ 50,00"
-                onChange={handleChangeEditRevenue}
                 placeholder="R$ 0,00"
                 _placeholder={{ color: "green" }}
                 fontSize="1.5rem"
@@ -662,7 +788,7 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Despesas
                   </Text>
-                  <Text fontSize="1.5rem">R$ 0,00</Text>
+                  <Text fontSize="1.5rem">R$ {totalBalanceExpense}</Text>
                 </CardLeft>
 
                 <CardRight>
@@ -704,7 +830,7 @@ export default function Dashboard() {
                   <Tr>
                     <Th width="20%">Situação</Th>
                     <Th width="20%" isNumeric>
-                      Data
+                      Data de criação
                     </Th>
                     <Th width="30%">Descrição</Th>
                     <Th width="5%" isNumeric>
@@ -714,39 +840,51 @@ export default function Dashboard() {
                   </Tr>
                 </Thead>
 
-                <Tbody>
-                  <Tr>
-                    <Td>Pendente</Td>
-                    <Td isNumeric>04/06/2023</Td>
-                    <Td>Algar telecom</Td>
-                    <Td color="#f00">R$ 31,03</Td>
-                    <Td>
-                      <DivAcoes>
-                        <Icon
-                          onClick={() => setOpenPayExpense(true)}
-                          cursor="pointer"
-                          as={FiCheckCircle}
-                          w="1rem"
-                          h="1rem"
-                        />
-                        <Icon
-                          onClick={() => setOpenEditExpense(true)}
-                          cursor="pointer"
-                          as={FiEdit}
-                          w="1rem"
-                          h="1rem"
-                        />
-                        <Icon
-                          onClick={() => setOpenDeleteExpense(true)}
-                          cursor="pointer"
-                          as={AiOutlineDelete}
-                          w="1rem"
-                          h="1rem"
-                        />
-                      </DivAcoes>
-                    </Td>
-                  </Tr>
-                </Tbody>
+                {expenseData.map((expense: ExpenseData) => {
+                  return (
+                    <Tbody key={expense.id}>
+                      <Tr>
+                        <Td>
+                          {expense.status === false ? (
+                            <Text color="red">Pendente</Text>
+                          ) : (
+                            <Text color="green">Pago</Text>
+                          )}
+                        </Td>
+                        <Td isNumeric>
+                          {moment(expense.created_at).format("DD/MM/YYYY")}
+                        </Td>
+                        <Td>{expense.description}</Td>
+                        <Td color="#f00">R$: {expense.balance}</Td>
+                        <Td>
+                          <DivAcoes>
+                            <Icon
+                              onClick={() => setOpenPayExpense(true)}
+                              cursor="pointer"
+                              as={FiCheckCircle}
+                              w="1rem"
+                              h="1rem"
+                            />
+                            <Icon
+                              onClick={() => setOpenEditExpense(true)}
+                              cursor="pointer"
+                              as={FiEdit}
+                              w="1rem"
+                              h="1rem"
+                            />
+                            <Icon
+                              onClick={() => setOpenDeleteExpense(true)}
+                              cursor="pointer"
+                              as={AiOutlineDelete}
+                              w="1rem"
+                              h="1rem"
+                            />
+                          </DivAcoes>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  );
+                })}
               </Table>
             </TableContainer>
           </DivDespesas>
