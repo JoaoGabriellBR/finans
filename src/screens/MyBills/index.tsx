@@ -68,6 +68,7 @@ export default function MyBills() {
   const [billId, setBillId] = useState();
 
   const [loadingNewBill, setLoadingNewBill] = useState(false);
+  const [loadingEditBill, setLoadingEditBill] = useState(false);
   const [loadingDeleteBill, setLoadingDeleteBill] = useState(false);
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
@@ -94,7 +95,6 @@ export default function MyBills() {
         },
       });
       setBillData(response?.data?.response);
-      console.log(billData);
     } catch (e) {
       const errorMessage = "Não foi possível carregar os dados.";
       notification(toast, errorMessage, "error");
@@ -159,6 +159,38 @@ export default function MyBills() {
       notification(toast, errorMessage, "error");
     }
   };
+
+  const handleEditBill = async () => {
+    setLoadingEditBill(true);
+    try {
+      const numericValue = getNumericValue(billDataUpdate.balance.toString());
+      await api({
+        method: "PATCH",
+        url: `/bill/update/${billId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          ...billDataUpdate,
+          balance: numericValue,
+          description: billDataUpdate.description,
+        },
+      });
+
+      setLoadingEditBill(false);
+      setOpenEditBill(false);
+      loadData();
+      const successMessage = "Conta atualizada com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      console.log(error);
+      setLoadingEditBill(false);
+      setOpenEditBill(false);
+      const errorMessage = error?.response?.data?.error || "Ocorreu um erro ao atualizar a conta.";
+      notification(toast, errorMessage, "error");
+    }
+  }
 
   const handleDeleteBill = async () => {
     try {
@@ -270,8 +302,8 @@ export default function MyBills() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3}>
-              Salvar
+            <Button onClick={handleEditBill} colorScheme="blue" mr={3}>
+              {loadingEditBill ? "Salvando" : "Salvar"}
             </Button>
             <Button onClick={() => setOpenEditBill(false)}>Cancelar</Button>
           </ModalFooter>
@@ -429,7 +461,7 @@ export default function MyBills() {
                   </div>
 
                   <Menu>
-                    <MenuButton>
+                    <MenuButton onClick={() => setBillId(bill?.id)}>
                       <Icon
                         cursor="pointer"
                         as={FiMoreHorizontal}
@@ -444,18 +476,13 @@ export default function MyBills() {
                           onClick={() => {
                             setOpenEditBill(true);
                             setBillDataUpdate(bill);
-                            console.log(billDataUpdate)
+                            console.log(billDataUpdate);
                           }}
                         >
                           <Icon as={AiOutlineEdit} mr="1rem" />
                           Editar
                         </MenuItem>
-                        <MenuItem
-                          onClick={() => {
-                            setOpenDeleteBill(true);
-                            setBillId(bill?.id);
-                          }}
-                        >
+                        <MenuItem onClick={() => setOpenDeleteBill(true)}>
                           <Icon as={AiOutlineDelete} mr="1rem" />
                           Excluir
                         </MenuItem>
