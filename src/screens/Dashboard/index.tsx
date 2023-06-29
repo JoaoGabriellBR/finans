@@ -14,6 +14,7 @@ import {
   DivAcoes,
   DivSwitch,
   DivDelete,
+  DivPayExpense,
 } from "./styles";
 import {
   Tooltip,
@@ -85,11 +86,13 @@ export default function Dashboard() {
   const toast = useToast();
 
   const [loadingNewExpense, setLoadingNewExpense] = useState(false);
+  const [loadingPayExpense, setLoadingPayExpense] = useState(false);
+  const [loadingDeleteExpense, setLoadingDeleteExpense] = useState(false);
   const [loadingNewRevenue, setLoadingNewRevenue] = useState(false);
 
   const [billData, setBillData] = useState<BillData[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
-  const [billId, setBillId] = useState();
+  const [updateExpenseData, setUpdateExpenseData] = useState<ExpenseData[]>([]);
   const [selectedBill, setSelectedBill] = useState<string>("");
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
@@ -174,10 +177,10 @@ export default function Dashboard() {
     setTotalBalanceExpense(sum);
   };
   
-  // Chamada da função para calcular o total inicialmente
+  // Chamada da função para calcular o total das Despesas inicialmente
   useEffect(() => {
     calculateTotalBalanceExpense();
-  }, []);
+  }, [expenseData]);
 
   const handleChangeBalanceNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
     setBalanceNewExpense(formatCurrency(e.target.value));
@@ -224,6 +227,55 @@ export default function Dashboard() {
       notification(toast, errorMessage, "error");
     }
   };
+
+  const handlePayExpense = async () => {
+    setLoadingPayExpense(true);
+    try {
+      await api({
+        method: "PATCH",
+        url: `/pay-expense/${updateExpenseData?.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setLoadingPayExpense(false);
+      setOpenPayExpense(false);
+      loadData();
+      const successMessage = "Despesa paga com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingPayExpense(false);
+      setOpenPayExpense(false);
+      const errorMessage = error?.response?.data?.error || "Não foi possível pagar a despesa.";
+      notification(toast, errorMessage, "error");
+    }
+  };
+
+  const handleDeleteExpense = async () => {
+    setLoadingDeleteExpense(true);
+    try {
+      await api({
+        method: "PATCH",
+        url: `/expense/delete/${updateExpenseData?.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setLoadingDeleteExpense(false);
+      setOpenDeleteExpense(false);
+      loadData();
+      const successMessage = "Despesa excluída com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingDeleteExpense(false);
+      setOpenDeleteExpense(false);
+      const errorMessage = error?.response?.data?.error || "Não foi possível excluir a despesa.";
+      notification(toast, errorMessage, "error");
+    }
+  };
+
 
   const renderNewExpense = () => {
     return (
@@ -311,33 +363,27 @@ export default function Dashboard() {
             <Text mb="1rem" fontSize="1rem">
               Ao efetivar essa despesa será descontado o valor na conta.
             </Text>
-            <FormControl id="currency" mb="2rem">
-              <Input
-                // disabled
-                variant="flushed"
-                type="text"
-                // value={value}
-                value="R$ 31,03"
-                // onChange={handleChangeEditExpense}
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "#f00" }}
-                fontSize="1.5rem"
-                color="#f00"
-              />
-            </FormControl>
 
-            <Input
-              variant="flushed"
-              type="text"
-              placeholder="Descrição"
-              maxLength={500}
-              value="Algar telecom"
-            />
+            <DivPayExpense>
+              <Box mb="1rem">
+                <Text fontSize="1rem">Descrição</Text>
+                <Text color="gray" fontSize="1rem">
+                  {updateExpenseData.description}
+                </Text>
+              </Box>
+
+              <Box>
+                <Text fontSize="1rem">Valor</Text>
+                <Text color="gray" fontSize="1rem">
+                  R$ {updateExpenseData.balance}
+                </Text>
+              </Box>
+            </DivPayExpense>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="red" mr={3}>
-              Pagar
+            <Button onClick={handlePayExpense} colorScheme="red" mr={3}>
+              {loadingPayExpense ? "Pagando..." : "Pagar"}
             </Button>
             <Button onClick={() => setOpenPayExpense(false)}>Cancelar</Button>
           </ModalFooter>
@@ -420,22 +466,22 @@ export default function Dashboard() {
               <Box mb="1rem">
                 <Text fontSize="1rem">Descrição</Text>
                 <Text color="gray" fontSize="1rem">
-                  Algar telecom
+                  {updateExpenseData.description}
                 </Text>
               </Box>
 
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ 31,03
+                  R$ {updateExpenseData.balance}
                 </Text>
               </Box>
             </DivDelete>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="red" mr={3}>
-              Excluir
+            <Button onClick={handleDeleteExpense} colorScheme="red" mr={3}>
+              {loadingDeleteExpense ? "Excluindo..." : "Excluir"}
             </Button>
             <Button onClick={() => setOpenDeleteExpense(false)}>
               Cancelar
@@ -855,25 +901,35 @@ export default function Dashboard() {
                           {moment(expense.created_at).format("DD/MM/YYYY")}
                         </Td>
                         <Td>{expense.description}</Td>
-                        <Td color="#f00">R$: {expense.balance}</Td>
+                        <Td color="#f00">R$ {expense.balance}</Td>
                         <Td>
                           <DivAcoes>
                             <Icon
-                              onClick={() => setOpenPayExpense(true)}
+                              disabled={expense.status === true}
+                              onClick={() => {
+                                setOpenPayExpense(true);
+                                setUpdateExpenseData(expense);
+                              }}
                               cursor="pointer"
                               as={FiCheckCircle}
                               w="1rem"
                               h="1rem"
                             />
                             <Icon
-                              onClick={() => setOpenEditExpense(true)}
+                              onClick={() => {
+                                setOpenEditExpense(true);
+                                setUpdateExpenseData(expense);
+                              }}
                               cursor="pointer"
                               as={FiEdit}
                               w="1rem"
                               h="1rem"
                             />
                             <Icon
-                              onClick={() => setOpenDeleteExpense(true)}
+                              onClick={() => {
+                                setOpenDeleteExpense(true);
+                                setUpdateExpenseData(expense);
+                              }}
                               cursor="pointer"
                               as={AiOutlineDelete}
                               w="1rem"
