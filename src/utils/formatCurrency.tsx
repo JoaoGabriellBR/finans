@@ -15,3 +15,5 @@ export const getNumericValue = (formattedValue: string) => {
   );
   return numericValue;
 };
+
+

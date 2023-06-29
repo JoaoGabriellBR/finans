@@ -72,13 +72,14 @@ type BillData = {
   description: string;
 };
 
-type ExpenseData = {
-  id: number;
-  description: string;
-  balance: number;
-  status: boolean;
-  created_at: number;
-};
+interface ExpenseData {
+  id?: number | undefined;
+  description?: string | undefined;
+  balance?: number | undefined;
+  status?: boolean | undefined;
+  created_at?: number | undefined;
+}
+
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -87,12 +88,13 @@ export default function Dashboard() {
 
   const [loadingNewExpense, setLoadingNewExpense] = useState(false);
   const [loadingPayExpense, setLoadingPayExpense] = useState(false);
+  const [loadingEditExpense, setLoadingEditExpense] = useState(false);
   const [loadingDeleteExpense, setLoadingDeleteExpense] = useState(false);
   const [loadingNewRevenue, setLoadingNewRevenue] = useState(false);
 
   const [billData, setBillData] = useState<BillData[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
-  const [updateExpenseData, setUpdateExpenseData] = useState<ExpenseData[]>([]);
+  const [updateExpenseData, setUpdateExpenseData] = useState<ExpenseData>();
   const [selectedBill, setSelectedBill] = useState<string>("");
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
@@ -169,13 +171,15 @@ export default function Dashboard() {
 
   const calculateTotalBalanceExpense = () => {
     const sum = expenseData.reduce((accumulator, expense) => {
-      if (expense.status === true) {
+      if (expense.balance !== undefined) {
         return accumulator + expense.balance;
+      } else {
+        return accumulator;
       }
-      return accumulator;
     }, 0);
     setTotalBalanceExpense(sum);
   };
+  
   
   // Chamada da função para calcular o total das Despesas inicialmente
   useEffect(() => {
@@ -184,6 +188,12 @@ export default function Dashboard() {
 
   const handleChangeBalanceNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
     setBalanceNewExpense(formatCurrency(e.target.value));
+  };
+
+  const handleChangeBalanceEditExpense = (e: ChangeEvent<HTMLInputElement>) => {
+    const updateBalance = { ...updateExpenseData };
+    updateBalance.balance = parseFloat(formatCurrency(e.target.value));
+    setBalanceEditExpense(updateBalance);
   };
 
   const handleChangeDescriptionNewExpense = (
@@ -252,6 +262,37 @@ export default function Dashboard() {
     }
   };
 
+  const handleEditExpense = async () => {
+    setLoadingEditExpense(true);
+    try {
+      await api({
+        method: "PATCH",
+        url: `/expense/update/${updateExpenseData?.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          ...updateExpenseData,
+          balance: updateExpenseData?.balance,
+          description: updateExpenseData?.description,
+          status: updateExpenseData?.status,
+        }
+      });
+      setLoadingEditExpense(false);
+
+      setOpenEditExpense(false);
+      loadData();
+      const successMessage = "Despesa atualizada com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingEditExpense(false);
+      setOpenEditExpense(false);
+      const errorMessage = error?.response?.data?.error || "Não foi possível atualizar a despesa.";
+      notification(toast, errorMessage, "error");
+    }
+  }
+
   const handleDeleteExpense = async () => {
     setLoadingDeleteExpense(true);
     try {
@@ -275,7 +316,6 @@ export default function Dashboard() {
       notification(toast, errorMessage, "error");
     }
   };
-
 
   const renderNewExpense = () => {
     return (
@@ -368,14 +408,14 @@ export default function Dashboard() {
               <Box mb="1rem">
                 <Text fontSize="1rem">Descrição</Text>
                 <Text color="gray" fontSize="1rem">
-                  {updateExpenseData.description}
+                  {updateExpenseData?.description}
                 </Text>
               </Box>
 
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ {updateExpenseData.balance}
+                  R$ {updateExpenseData?.balance}
                 </Text>
               </Box>
             </DivPayExpense>
@@ -408,6 +448,8 @@ export default function Dashboard() {
                 _placeholder={{ color: "#f00" }}
                 fontSize="1.5rem"
                 color="#f00"
+                value={`R$ ${updateExpenseData?.balance}`}
+                onChange={handleChangeBalanceEditExpense}
               />
             </FormControl>
 
@@ -430,7 +472,16 @@ export default function Dashboard() {
                 />
                 <Text fontSize="1rem">Não foi paga</Text>
               </div>
-              <Switch colorScheme="red" />
+              <Switch
+                isChecked={updateExpenseData?.status}
+                onChange={() =>
+                  setUpdateExpenseData({
+                    ...updateExpenseData,
+                    status: !updateExpenseData?.status,
+                  })
+                }
+                colorScheme="red"
+              />
             </DivSwitch>
           </ModalBody>
 
@@ -466,14 +517,14 @@ export default function Dashboard() {
               <Box mb="1rem">
                 <Text fontSize="1rem">Descrição</Text>
                 <Text color="gray" fontSize="1rem">
-                  {updateExpenseData.description}
+                  {updateExpenseData?.description}
                 </Text>
               </Box>
 
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ {updateExpenseData.balance}
+                  R$ {updateExpenseData?.balance}
                 </Text>
               </Box>
             </DivDelete>
@@ -834,7 +885,7 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Despesas
                   </Text>
-                  <Text fontSize="1.5rem">R$ {totalBalanceExpense}</Text>
+                  <Text fontSize="1.5rem">R$ {totalBalanceExpense.toFixed(2)}</Text>
                 </CardLeft>
 
                 <CardRight>
