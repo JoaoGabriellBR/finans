@@ -48,6 +48,7 @@ import {
   ModalOverlay,
   useMediaQuery,
   useToast,
+  IconButton,
 } from "@chakra-ui/react";
 import { SiStarlingbank } from "react-icons/si";
 import {
@@ -80,6 +81,13 @@ interface ExpenseData {
   created_at?: number | undefined;
 }
 
+interface RevenueData {
+  id?: number | undefined;
+  description?: string | undefined;
+  balance?: number | undefined;
+  status?: boolean | undefined;
+  created_at?: number | undefined;
+}
 
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -91,11 +99,18 @@ export default function Dashboard() {
   const [loadingEditExpense, setLoadingEditExpense] = useState(false);
   const [loadingDeleteExpense, setLoadingDeleteExpense] = useState(false);
   const [loadingNewRevenue, setLoadingNewRevenue] = useState(false);
+  const [loadingReceiveRevenue, setLoadingReceiveRevenue] = useState(false);
+  const [loadingDeleteRevenue, setLoadingDeleteRevenue] = useState(false);
 
   const [billData, setBillData] = useState<BillData[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
+  const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
+
   const [updateExpenseData, setUpdateExpenseData] = useState<ExpenseData>();
-  const [selectedBill, setSelectedBill] = useState<string>("");
+  const [updateRevenueData, setUpdateRevenueData] = useState<RevenueData>();
+
+  const [selectedBillExpense, setSelectedBillExpense] = useState<string>("");
+  const [selectedBillRevenue, setSelectedBillRevenue] = useState<string>("");
 
   const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openPayExpense, setOpenPayExpense] = useState(false);
@@ -107,27 +122,28 @@ export default function Dashboard() {
   const [openEditRevenue, setOpenEditRevenue] = useState(false);
   const [openDeleteRevenue, setOpenDeleteRevenue] = useState(false);
 
-  const [balanceNewExpense, setBalanceNewExpense] = useState('');
-  const [balanceEditExpense, setBalanceEditExpense] = useState('');
+  const [balanceNewExpense, setBalanceNewExpense] = useState("");
+  const [balanceEditExpense, setBalanceEditExpense] = useState("");
 
-  const [descriptionNewExpense, setDescriptionNewExpense] = useState('');
-  const [descriptionEditExpense, setDescriptionEditExpense] = useState('');
+  const [descriptionNewExpense, setDescriptionNewExpense] = useState("");
+  const [descriptionEditExpense, setDescriptionEditExpense] = useState("");
 
   const [statusNewExpense, setStatusNewExpense] = useState(Boolean);
   const [statusEditExpense, setStatusEditExpense] = useState(Boolean);
 
-  const [balanceNewRevenue, setBalanceNewRevenue] = useState('');
-  const [balanceEditRevenue, setBalanceEditRevenue] = useState('');
+  const [balanceNewRevenue, setBalanceNewRevenue] = useState("");
+  const [balanceEditRevenue, setBalanceEditRevenue] = useState("");
 
-  const [descriptionNewRevenue, setDescriptionNewRevenue] = useState('');
-  const [descriptionEditRevenue, setDescriptionEditRevenue] = useState('');
+  const [descriptionNewRevenue, setDescriptionNewRevenue] = useState("");
+  const [descriptionEditRevenue, setDescriptionEditRevenue] = useState("");
 
   const [statusNewRevenue, setStatusNewRevenue] = useState(Boolean);
   const [statusEditRevenue, setStatusEditRevenue] = useState(Boolean);
 
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
+  const [totalBalanceRevenue, setTotalBalanceRevenue] = useState<number>(0);
 
-  const loadData = async () => {
+  const loadExpenseData = async () => {
     try {
       const response = await api({
         method: "GET",
@@ -145,7 +161,28 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    loadData();
+    loadExpenseData();
+  }, []);
+
+  const loadRevenueData = async () => {
+    try {
+      const response = await api({
+        method: "GET",
+        url: "/revenue/get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setRevenueData(response?.data?.response);
+    } catch (e) {
+      const errorMessage = "Não foi possível carregar os dados.";
+      notification(toast, errorMessage, "error");
+    }
+  };
+
+  useEffect(() => {
+    loadRevenueData();
   }, []);
 
   const loadBillData = async () => {
@@ -179,15 +216,35 @@ export default function Dashboard() {
     }, 0);
     setTotalBalanceExpense(sum);
   };
-  
-  
+
   // Chamada da função para calcular o total das Despesas inicialmente
   useEffect(() => {
     calculateTotalBalanceExpense();
   }, [expenseData]);
 
+  const calculateTotalBalanceRevenue = () => {
+    const sum = revenueData.reduce((accumulator, revenue) => {
+      if (revenue.balance !== undefined) {
+        return accumulator + revenue.balance;
+      } else {
+        return accumulator;
+      }
+    }, 0);
+    setTotalBalanceRevenue(sum);
+  };
+
+  // Chamada da função para calcular o total das Receitas inicialmente
+  useEffect(() => {
+    calculateTotalBalanceRevenue();
+  }, [revenueData]);
+
   const handleChangeBalanceNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
     setBalanceNewExpense(formatCurrency(e.target.value));
+  };
+
+  const handleChangeBalanceNewRevenue = (e: ChangeEvent<HTMLInputElement>) => {
+    setBalanceNewRevenue(formatCurrency(e.target.value));
+    console.log(formatCurrency(e.target.value))
   };
 
   const handleChangeBalanceEditExpense = (e: ChangeEvent<HTMLInputElement>) => {
@@ -202,8 +259,10 @@ export default function Dashboard() {
     setDescriptionNewExpense(e.target.value);
   };
 
-  const handleChangeStatusNewExpense = (e: any) => {
-    setStatusNewExpense(e.target.value);
+  const handleChangeDescriptionNewRevenue = (
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    setDescriptionNewRevenue(e.target.value);
   };
 
   const handleNewExpense = async () => {
@@ -218,16 +277,21 @@ export default function Dashboard() {
           Authorization: Cookies.get("finans-authtoken"),
         },
         data: {
-          id_bill: selectedBill,
+          id_bill: selectedBillExpense,
           balance: numericValue,
           description: descriptionNewExpense,
           status: statusNewExpense,
         },
       });
 
+      setSelectedBillExpense("");
+      setBalanceNewExpense("");
+      setDescriptionNewExpense("");
+      setStatusNewExpense(false);
+
       setLoadingNewExpense(false);
       setOpenNewExpense(false);
-      loadData();
+      loadExpenseData();
       const successMessage = "Despesa criada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -251,13 +315,14 @@ export default function Dashboard() {
       });
       setLoadingPayExpense(false);
       setOpenPayExpense(false);
-      loadData();
+      loadExpenseData();
       const successMessage = "Despesa paga com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingPayExpense(false);
       setOpenPayExpense(false);
-      const errorMessage = error?.response?.data?.error || "Não foi possível pagar a despesa.";
+      const errorMessage =
+        error?.response?.data?.error || "Não foi possível pagar a despesa.";
       notification(toast, errorMessage, "error");
     }
   };
@@ -277,21 +342,22 @@ export default function Dashboard() {
           balance: updateExpenseData?.balance,
           description: updateExpenseData?.description,
           status: updateExpenseData?.status,
-        }
+        },
       });
       setLoadingEditExpense(false);
 
       setOpenEditExpense(false);
-      loadData();
+      loadExpenseData();
       const successMessage = "Despesa atualizada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingEditExpense(false);
       setOpenEditExpense(false);
-      const errorMessage = error?.response?.data?.error || "Não foi possível atualizar a despesa.";
+      const errorMessage =
+        error?.response?.data?.error || "Não foi possível atualizar a despesa.";
       notification(toast, errorMessage, "error");
     }
-  }
+  };
 
   const handleDeleteExpense = async () => {
     setLoadingDeleteExpense(true);
@@ -306,16 +372,108 @@ export default function Dashboard() {
       });
       setLoadingDeleteExpense(false);
       setOpenDeleteExpense(false);
-      loadData();
+      loadExpenseData();
       const successMessage = "Despesa excluída com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingDeleteExpense(false);
       setOpenDeleteExpense(false);
-      const errorMessage = error?.response?.data?.error || "Não foi possível excluir a despesa.";
+      const errorMessage =
+        error?.response?.data?.error || "Não foi possível excluir a despesa.";
       notification(toast, errorMessage, "error");
     }
   };
+
+
+
+  const handleNewRevenue = async () => {
+    setLoadingNewRevenue(true);
+    try {
+      const numericValue = getNumericValue(balanceNewRevenue);
+      await api({
+        method: "POST",
+        url: "/revenue/create",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          id_bill: selectedBillRevenue,
+          balance: numericValue,
+          description: descriptionNewRevenue,
+          status: statusNewRevenue,
+        },
+      });
+
+      setSelectedBillRevenue("");
+      setBalanceNewRevenue("");
+      setDescriptionNewRevenue("");
+      setStatusNewRevenue(false);
+
+      setLoadingNewRevenue(false);
+      setOpenNewRevenue(false);
+      loadRevenueData();
+      const successMessage = "Receita criada com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingNewRevenue(false);
+      setOpenNewRevenue(false);
+      const errorMessage = error?.response?.data?.error;
+      notification(toast, errorMessage, "error");
+    }
+  };
+
+  const handleReceiveRevenue = async () => {
+    setLoadingReceiveRevenue(true);
+    try {
+      await api({
+        method: "PATCH",
+        url: `/receive-revenue/${updateRevenueData?.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setLoadingReceiveRevenue(false);
+      setOpenReceiveRevenue(false);
+      loadRevenueData();
+      const successMessage = "Receita recebida com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingReceiveRevenue(false);
+      setOpenReceiveRevenue(false);
+      const errorMessage =
+        error?.response?.data?.error || "Não foi possível processar o recebimento da receita.";
+      notification(toast, errorMessage, "error");
+    }
+  };
+
+  const handleDeleteRevenue = async () => {
+    setLoadingDeleteRevenue(true);
+    try {
+      await api({
+        method: "PATCH",
+        url: `/revenue/delete/${updateRevenueData?.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+      setLoadingDeleteRevenue(false);
+      setOpenDeleteRevenue(false);
+      loadRevenueData();
+      const successMessage = "Receita excluída com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingDeleteRevenue(false);
+      setOpenDeleteRevenue(false);
+      const errorMessage = error?.response?.data?.error || "Não foi possível excluir a receita.";
+      notification(toast, errorMessage, "error");
+    }
+  };
+
+
+
 
   const renderNewExpense = () => {
     return (
@@ -352,8 +510,8 @@ export default function Dashboard() {
               mb="1.5rem"
               variant="flushed"
               placeholder="Selecione uma conta"
-              value={selectedBill}
-              onChange={(e) => setSelectedBill(e.target.value)}
+              value={selectedBillExpense}
+              onChange={(e) => setSelectedBillExpense(e.target.value)}
             >
               {billData.map((bill: BillData) => (
                 <option key={bill.id} value={bill.id}>
@@ -559,15 +717,34 @@ export default function Dashboard() {
                 _placeholder={{ color: "green" }}
                 fontSize="1.5rem"
                 color="green"
+                value={`R$ ${balanceNewRevenue}`}
+                onChange={handleChangeBalanceNewRevenue}
               />
             </FormControl>
 
             <Input
+              mb="1.5rem"
               variant="flushed"
               type="text"
               placeholder="Descrição"
               maxLength={500}
+              value={descriptionNewRevenue}
+              onChange={handleChangeDescriptionNewRevenue}
             />
+
+            <Select
+              mb="1.5rem"
+              variant="flushed"
+              placeholder="Selecione uma conta"
+              value={selectedBillRevenue}
+              onChange={(e) => setSelectedBillRevenue(e.target.value)}
+            >
+              {billData.map((bill: BillData) => (
+                <option key={bill.id} value={bill.id}>
+                  {bill.description}
+                </option>
+              ))}
+            </Select>
 
             <DivSwitch>
               <div className="div-switch-icon">
@@ -580,13 +757,17 @@ export default function Dashboard() {
                 />
                 <Text fontSize="1rem">Não foi recebida</Text>
               </div>
-              <Switch colorScheme="green" />
+              <Switch
+                isChecked={statusNewRevenue}
+                onChange={() => setStatusNewRevenue(!statusNewRevenue)}
+                colorScheme="green"
+              />
             </DivSwitch>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="green" mr={3}>
-              Salvar
+            <Button onClick={handleNewRevenue} colorScheme="green" mr={3}>
+              {loadingNewRevenue ? "Salvando..." : "Salvar"}
             </Button>
             <Button onClick={() => setOpenNewRevenue(false)}>Cancelar</Button>
           </ModalFooter>
@@ -605,33 +786,32 @@ export default function Dashboard() {
         <ModalContent>
           <ModalHeader>Deseja efetivar esta receita?</ModalHeader>
           <ModalCloseButton />
+
           <ModalBody pb={6}>
             <Text mb="1rem" fontSize="1rem">
-              Ao efetivar essa receita será adicionado o valor na conta.
+              Ao efetivar essa receita, será adicionado o valor na conta.
             </Text>
-            <FormControl id="currency" mb="2rem">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "green" }}
-                fontSize="1.5rem"
-                color="green"
-              />
-            </FormControl>
 
-            <Input
-              variant="flushed"
-              type="text"
-              placeholder="Descrição"
-              maxLength={500}
-              value="Receita de teste"
-            />
+            <DivPayExpense>
+              <Box mb="1rem">
+                <Text fontSize="1rem">Descrição</Text>
+                <Text color="gray" fontSize="1rem">
+                  {updateRevenueData?.description}
+                </Text>
+              </Box>
+
+              <Box>
+                <Text fontSize="1rem">Valor</Text>
+                <Text color="gray" fontSize="1rem">
+                  R$ {updateRevenueData?.balance}
+                </Text>
+              </Box>
+            </DivPayExpense>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="green" mr={3}>
-              Receber
+            <Button onClick={handleReceiveRevenue} colorScheme="green" mr={3}>
+              {loadingReceiveRevenue ? "Recebendo..." : "Receber"}
             </Button>
             <Button onClick={() => setOpenReceiveRevenue(false)}>
               Cancelar
@@ -716,22 +896,22 @@ export default function Dashboard() {
               <Box mb="1rem">
                 <Text fontSize="1rem">Descrição</Text>
                 <Text color="gray" fontSize="1rem">
-                  Receita de teste
+                  {updateRevenueData?.description}
                 </Text>
               </Box>
 
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ 50,00
+                  R$ {updateRevenueData?.balance}
                 </Text>
               </Box>
             </DivDelete>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="green" mr={3}>
-              Excluir
+            <Button onClick={handleDeleteRevenue} colorScheme="green" mr={3}>
+              {loadingDeleteRevenue ? "Excluindo..." : "Excluir"}
             </Button>
             <Button onClick={() => setOpenDeleteRevenue(false)}>
               Cancelar
@@ -862,7 +1042,7 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Receitas
                   </Text>
-                  <Text fontSize="1.5rem">R$ 0,00</Text>
+                  <Text fontSize="1.5rem"> R$ {totalBalanceRevenue.toFixed(2)}</Text>
                 </CardLeft>
 
                 <CardRight>
@@ -885,7 +1065,9 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Despesas
                   </Text>
-                  <Text fontSize="1.5rem">R$ {totalBalanceExpense.toFixed(2)}</Text>
+                  <Text fontSize="1.5rem">
+                    R$ {totalBalanceExpense.toFixed(2)}
+                  </Text>
                 </CardLeft>
 
                 <CardRight>
@@ -917,10 +1099,6 @@ export default function Dashboard() {
           </DivTitleDespesas>
 
           <DivDespesas>
-            <Text fontSize="1rem" mb="2rem">
-              Junho de 2023
-            </Text>
-
             <TableContainer width="100%">
               <Table variant="simple">
                 <Thead>
@@ -955,17 +1133,19 @@ export default function Dashboard() {
                         <Td color="#f00">R$ {expense.balance}</Td>
                         <Td>
                           <DivAcoes>
-                            <Icon
-                              disabled={expense.status === true}
+                            <button
                               onClick={() => {
                                 setOpenPayExpense(true);
                                 setUpdateExpenseData(expense);
                               }}
-                              cursor="pointer"
-                              as={FiCheckCircle}
-                              w="1rem"
-                              h="1rem"
-                            />
+                              disabled={expense.status !== false}
+                            >
+                              <FiCheckCircle
+                                cursor="pointer"
+                                aria-label="Pay expense"
+                              />
+                            </button>
+
                             <Icon
                               onClick={() => {
                                 setOpenEditExpense(true);
@@ -1033,39 +1213,63 @@ export default function Dashboard() {
                   </Tr>
                 </Thead>
 
-                <Tbody>
-                  <Tr>
-                    <Td>Pendente</Td>
-                    <Td isNumeric>04/06/2023</Td>
-                    <Td>Receita de teste</Td>
-                    <Td color="green">R$ 50,00</Td>
-                    <Td>
-                      <DivAcoes>
-                        <Icon
-                          onClick={() => setOpenReceiveRevenue(true)}
-                          cursor="pointer"
-                          as={FiCheckCircle}
-                          w="1rem"
-                          h="1rem"
-                        />
-                        <Icon
-                          onClick={() => setOpenEditRevenue(true)}
-                          cursor="pointer"
-                          as={FiEdit}
-                          w="1rem"
-                          h="1rem"
-                        />
-                        <Icon
-                          onClick={() => setOpenDeleteRevenue(true)}
-                          cursor="pointer"
-                          as={AiOutlineDelete}
-                          w="1rem"
-                          h="1rem"
-                        />
-                      </DivAcoes>
-                    </Td>
-                  </Tr>
-                </Tbody>
+                {revenueData.map((revenue: RevenueData) => {
+                  return (
+                    <Tbody key={revenue.id}>
+                      <Tr>
+                        <Td>
+                          {revenue.status === false ? (
+                            <Text color="red">Pendente</Text>
+                          ) : (
+                            <Text color="green">Pago</Text>
+                          )}
+                        </Td>
+                        <Td isNumeric>
+                          {moment(revenue.created_at).format("DD/MM/YYYY")}
+                        </Td>
+                        <Td>{revenue.description}</Td>
+                        <Td color="green">R$ {revenue.balance}</Td>
+                        <Td>
+                          <DivAcoes>
+                            <button
+                              onClick={() => {
+                                setOpenReceiveRevenue(true);
+                                setUpdateRevenueData(revenue);
+                              }}
+                              disabled={revenue.status !== false}
+                            >
+                              <FiCheckCircle
+                                cursor="pointer"
+                                aria-label="Pay expense"
+                              />
+                            </button>
+
+                            <Icon
+                              onClick={() => {
+                                setOpenEditRevenue(true);
+                                setUpdateRevenueData(revenue);
+                              }}
+                              cursor="pointer"
+                              as={FiEdit}
+                              w="1rem"
+                              h="1rem"
+                            />
+                            <Icon
+                              onClick={() => {
+                                setOpenDeleteRevenue(true);
+                                setUpdateRevenueData(revenue);
+                              }}
+                              cursor="pointer"
+                              as={AiOutlineDelete}
+                              w="1rem"
+                              h="1rem"
+                            />
+                          </DivAcoes>
+                        </Td>
+                      </Tr>
+                    </Tbody>
+                  );
+                })}
               </Table>
             </TableContainer>
           </DivReceitas>
