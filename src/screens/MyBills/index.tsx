@@ -49,6 +49,7 @@ import Cookies from "js-cookie";
 import api from "../../api";
 import notification from "../../utils/toast";
 import { formatCurrency, getNumericValue } from "../../utils/formatCurrency";
+import MoneyInput from "../../components/MoneyInput";
 
 interface BillData {
   id: number;
@@ -105,25 +106,28 @@ export default function MyBills() {
     loadData();
   }, []);
 
-  const handleChangeBalanceNewBill = (e: ChangeEvent<HTMLInputElement>) => {
-    setBalanceNewBill(formatCurrency(e.target.value));
+  const handleChangeBalanceNewBill = (value: string) => {
+    const rawValue = value.replace(/[^\d]/g, '');
+    const floatValue = parseFloat(rawValue) / 100;
+    const stringValue = floatValue.toString();
+    setBalanceNewBill(stringValue);
   };
-
+  
   const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
     setDescriptionNewBill(e.target.value);
   };
 
-  const handleChangeBalanceEditBill = (e: ChangeEvent<HTMLInputElement>) => {
-    const updatedBillData = { ...billDataUpdate };
-    updatedBillData.balance = formatCurrency(e.target.value);
-    setBillData(updatedBillData);
-  };
+  // const handleChangeBalanceEditBill = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const updatedBillData = { ...billDataUpdate };
+  //   updatedBillData.balance = formatCurrency(e.target.value);
+  //   setBillData(updatedBillData);
+  // };
 
-  const handleChangeDescriptionEditBill = (e: ChangeEvent<HTMLInputElement>) => {
-    const updatedBillData = { ...billDataUpdate };
-    updatedBillData.description = e.target.value;
-    setBillData(updatedBillData);
-  };
+  // const handleChangeDescriptionEditBill = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const updatedBillData = { ...billDataUpdate };
+  //   updatedBillData.description = e.target.value;
+  //   setBillData(updatedBillData);
+  // };
 
   const handleChangeNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -133,7 +137,6 @@ export default function MyBills() {
   const handleNewBill = async () => {
     setLoadingNewBill(true);
     try {
-      const numericValue = getNumericValue(balanceNewBill);
       await api({
         method: "POST",
         url: "/bill/create",
@@ -142,7 +145,7 @@ export default function MyBills() {
           Authorization: Cookies.get("finans-authtoken"),
         },
         data: {
-          balance: numericValue,
+          balance: parseFloat(balanceNewBill),
           description: descriptionNewBill,
         },
       });
@@ -226,7 +229,7 @@ export default function MyBills() {
           <ModalHeader>Nova Conta</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl id="currency" mb="2rem">
+            {/* <FormControl id="currency" mb="2rem">
               <Input
                 variant="flushed"
                 type="text"
@@ -237,7 +240,12 @@ export default function MyBills() {
                 value={`R$ ${balanceNewBill}`}
                 onChange={handleChangeBalanceNewBill}
               />
-            </FormControl>
+            </FormControl> */}
+
+            <MoneyInput
+              value={balanceNewBill}
+              onChange={handleChangeBalanceNewBill}
+            />
 
             <Input
               variant="flushed"
