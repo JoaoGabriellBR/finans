@@ -68,10 +68,11 @@ import api from "../../api";
 import Cookies from "js-cookie";
 import moment from "moment";
 
-type BillData = {
-  id: number;
-  description: string;
-};
+interface BillData {
+  id?: number | undefined;
+  description?: string | undefined;
+  balance?: number | undefined;
+}
 
 interface ExpenseData {
   id?: number | undefined;
@@ -140,6 +141,7 @@ export default function Dashboard() {
   const [statusNewRevenue, setStatusNewRevenue] = useState(Boolean);
   const [statusEditRevenue, setStatusEditRevenue] = useState(Boolean);
 
+  const [totalBalanceBill, setTotalBalanceBill] = useState<number>(0);
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
   const [totalBalanceRevenue, setTotalBalanceRevenue] = useState<number>(0);
 
@@ -206,9 +208,25 @@ export default function Dashboard() {
     loadBillData();
   }, []);
 
+  const calculateTotalBalanceBill = () => {
+    const sum = billData.reduce((accumulator, bill) => {
+      if (bill.balance !== undefined) {
+        return accumulator + bill.balance;
+      } else {
+        return accumulator;
+      }
+    }, 0);
+
+    setTotalBalanceBill(sum);
+  };
+  
   const calculateTotalBalanceExpense = () => {
     const sum = expenseData.reduce((accumulator, expense) => {
       if (expense.balance !== undefined) {
+        // Verifica se expense.status é true e subtrai o valor de expense.balance do totalBalanceBill
+        if (expense.status === true) {
+          setTotalBalanceBill((prevTotal) => prevTotal - expense.balance);
+        }
         return accumulator + expense.balance;
       } else {
         return accumulator;
@@ -217,14 +235,13 @@ export default function Dashboard() {
     setTotalBalanceExpense(sum);
   };
 
-  // Chamada da função para calcular o total das Despesas inicialmente
-  useEffect(() => {
-    calculateTotalBalanceExpense();
-  }, [expenseData]);
-
   const calculateTotalBalanceRevenue = () => {
     const sum = revenueData.reduce((accumulator, revenue) => {
       if (revenue.balance !== undefined) {
+        // Verifica se revenue.status é true e adiciona o valor de revenue.balance ao totalBalanceBill
+        if (revenue.status === true) {
+          setTotalBalanceBill((prevTotal) => prevTotal + revenue.balance);
+        }
         return accumulator + revenue.balance;
       } else {
         return accumulator;
@@ -232,8 +249,15 @@ export default function Dashboard() {
     }, 0);
     setTotalBalanceRevenue(sum);
   };
+  
+  useEffect(() => {
+    calculateTotalBalanceBill();
+  }, [billData]);
 
-  // Chamada da função para calcular o total das Receitas inicialmente
+  useEffect(() => {
+    calculateTotalBalanceExpense();
+  }, [expenseData]);
+
   useEffect(() => {
     calculateTotalBalanceRevenue();
   }, [revenueData]);
@@ -607,7 +631,12 @@ export default function Dashboard() {
                 fontSize="1.5rem"
                 color="#f00"
                 value={`R$ ${updateExpenseData?.balance}`}
-                onChange={handleChangeBalanceEditExpense}
+                // onChange={(e) =>
+                //   setUpdateExpenseData({
+                //     ...updateExpenseData,
+                //     balance: e.target.value
+                //   })
+                // }
               />
             </FormControl>
 
@@ -616,7 +645,13 @@ export default function Dashboard() {
               type="text"
               placeholder="Descrição"
               maxLength={500}
-              value="Algar telecom"
+              value={updateExpenseData?.description}
+              onChange={(e) =>
+                setUpdateExpenseData({
+                  ...updateExpenseData,
+                  description: e.target.value,
+                })
+              }
             />
 
             <DivSwitch>
@@ -628,7 +663,9 @@ export default function Dashboard() {
                   h="1rem"
                   mr="1rem"
                 />
-                <Text fontSize="1rem">Não foi paga</Text>
+                <Text fontSize="1rem">
+                  {updateExpenseData?.status ? "Pago" : "Não foi paga"}
+                </Text>
               </div>
               <Switch
                 isChecked={updateExpenseData?.status}
@@ -644,8 +681,8 @@ export default function Dashboard() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="red" mr={3}>
-              Salvar
+            <Button onClick={handleEditExpense} colorScheme="red" mr={3}>
+              {loadingEditExpense ? "Salvando..." : "Salvar"}
             </Button>
             <Button onClick={() => setOpenEditExpense(false)}>Cancelar</Button>
           </ModalFooter>
@@ -1019,7 +1056,7 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Saldo atual
                   </Text>
-                  <Text fontSize="1.5rem">R$ 680,00</Text>
+                  <Text fontSize="1.5rem">R$ {totalBalanceBill.toFixed(2)}</Text>
                 </CardLeft>
 
                 <CardRight>
@@ -1115,7 +1152,7 @@ export default function Dashboard() {
                   </Tr>
                 </Thead>
 
-                {expenseData.map((expense: ExpenseData) => {
+                {expenseData.length !== 0 ? expenseData.map((expense: ExpenseData) => {
                   return (
                     <Tbody key={expense.id}>
                       <Tr>
@@ -1171,7 +1208,9 @@ export default function Dashboard() {
                       </Tr>
                     </Tbody>
                   );
-                })}
+                }) : (
+                  <Text p='6'>Você não possui despesas cadastradas.</Text>
+                )}
               </Table>
             </TableContainer>
           </DivDespesas>
@@ -1213,7 +1252,7 @@ export default function Dashboard() {
                   </Tr>
                 </Thead>
 
-                {revenueData.map((revenue: RevenueData) => {
+                {revenueData.length !== 0 ? revenueData.map((revenue: RevenueData) => {
                   return (
                     <Tbody key={revenue.id}>
                       <Tr>
@@ -1221,7 +1260,7 @@ export default function Dashboard() {
                           {revenue.status === false ? (
                             <Text color="red">Pendente</Text>
                           ) : (
-                            <Text color="green">Pago</Text>
+                            <Text color="green">Recebido</Text>
                           )}
                         </Td>
                         <Td isNumeric>
@@ -1269,7 +1308,9 @@ export default function Dashboard() {
                       </Tr>
                     </Tbody>
                   );
-                })}
+                }) : (
+                  <Text p='6'>Você não possui receitas cadastradas.</Text>
+                )}
               </Table>
             </TableContainer>
           </DivReceitas>
