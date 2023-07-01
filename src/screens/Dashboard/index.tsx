@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent, ChangeEventHandler } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import {
   Container,
   RightBox,
@@ -63,10 +63,11 @@ import { useNavigate } from "react-router-dom";
 import SideMenu from "../../components/SideMenu";
 import handleLogout from "../../utils/handleLogout";
 import notification from "../../utils/toast";
-import { formatCurrency, getNumericValue } from "../../utils/formatCurrency";
+import { getNumericValue } from "../../utils/formatCurrency";
 import api from "../../api";
 import Cookies from "js-cookie";
 import moment from "moment";
+import MoneyInput from "../../components/MoneyInput";
 
 interface BillData {
   id?: number | undefined;
@@ -90,25 +91,47 @@ interface RevenueData {
   created_at?: number | undefined;
 }
 
+interface UpdateExpenseData {
+  id?: number | undefined;
+  description?: string | undefined;
+  balance?: string | undefined;
+  status?: boolean | undefined;
+  created_at?: number | undefined;
+}
+
+interface UpdateRevenueData {
+  id?: number | undefined;
+  description?: string | undefined;
+  balance?: string | undefined;
+  status?: boolean | undefined;
+  created_at?: number | undefined;
+}
+
 export default function Dashboard() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
   const navigate = useNavigate();
   const toast = useToast();
 
   const [loadingNewExpense, setLoadingNewExpense] = useState(false);
-  const [loadingPayExpense, setLoadingPayExpense] = useState(false);
-  const [loadingEditExpense, setLoadingEditExpense] = useState(false);
-  const [loadingDeleteExpense, setLoadingDeleteExpense] = useState(false);
   const [loadingNewRevenue, setLoadingNewRevenue] = useState(false);
+
+  const [loadingPayExpense, setLoadingPayExpense] = useState(false);
   const [loadingReceiveRevenue, setLoadingReceiveRevenue] = useState(false);
+
+  const [loadingEditExpense, setLoadingEditExpense] = useState(false);
+  const [loadingEditRevenue, setLoadingEditRevenue] = useState(false);
+
+  const [loadingDeleteExpense, setLoadingDeleteExpense] = useState(false);
   const [loadingDeleteRevenue, setLoadingDeleteRevenue] = useState(false);
 
   const [billData, setBillData] = useState<BillData[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
   const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
 
-  const [updateExpenseData, setUpdateExpenseData] = useState<ExpenseData>();
-  const [updateRevenueData, setUpdateRevenueData] = useState<RevenueData>();
+  const [updateExpenseData, setUpdateExpenseData] =
+    useState<UpdateExpenseData>();
+  const [updateRevenueData, setUpdateRevenueData] =
+    useState<UpdateRevenueData>();
 
   const [selectedBillExpense, setSelectedBillExpense] = useState<string>("");
   const [selectedBillRevenue, setSelectedBillRevenue] = useState<string>("");
@@ -155,6 +178,7 @@ export default function Dashboard() {
           Authorization: Cookies.get("finans-authtoken"),
         },
       });
+
       setExpenseData(response?.data?.response);
     } catch (e) {
       const errorMessage = "Não foi possível carregar os dados.";
@@ -219,7 +243,7 @@ export default function Dashboard() {
 
     setTotalBalanceBill(sum);
   };
-  
+
   const calculateTotalBalanceExpense = () => {
     const sum = expenseData.reduce((accumulator, expense) => {
       if (expense.balance !== undefined) {
@@ -249,7 +273,7 @@ export default function Dashboard() {
     }, 0);
     setTotalBalanceRevenue(sum);
   };
-  
+
   useEffect(() => {
     calculateTotalBalanceBill();
   }, [billData]);
@@ -262,19 +286,32 @@ export default function Dashboard() {
     calculateTotalBalanceRevenue();
   }, [revenueData]);
 
-  const handleChangeBalanceNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
-    setBalanceNewExpense(formatCurrency(e.target.value));
+  const handleChangeBalanceNewExpense = (value: string) => {
+    const rawValue = value.replace(/[^\d]/g, "");
+    const floatValue = parseFloat(rawValue) / 100;
+    const stringValue = floatValue.toString();
+    setBalanceNewExpense(stringValue);
   };
 
-  const handleChangeBalanceNewRevenue = (e: ChangeEvent<HTMLInputElement>) => {
-    setBalanceNewRevenue(formatCurrency(e.target.value));
-    console.log(formatCurrency(e.target.value))
+  const handleChangeBalanceNewRevenue = (value: string) => {
+    const rawValue = value.replace(/[^\d]/g, "");
+    const floatValue = parseFloat(rawValue) / 100;
+    const stringValue = floatValue.toString();
+    setBalanceNewRevenue(stringValue);
   };
 
-  const handleChangeBalanceEditExpense = (e: ChangeEvent<HTMLInputElement>) => {
-    const updateBalance = { ...updateExpenseData };
-    updateBalance.balance = parseFloat(formatCurrency(e.target.value));
-    setBalanceEditExpense(updateBalance);
+  const handleChangeBalanceEditExpense = (value: string) => {
+    const rawValue = value.replace(/[^\d]/g, "");
+    const floatValue = parseFloat(rawValue) / 100;
+    const stringValue = floatValue.toString();
+    setUpdateExpenseData({ ...updateExpenseData, balance: stringValue });
+  };
+
+  const handleChangeBalanceEditRevenue = (value: string) => {
+    const rawValue = value.replace(/[^\d]/g, "");
+    const floatValue = parseFloat(rawValue) / 100;
+    const stringValue = floatValue.toString();
+    setUpdateRevenueData({ ...updateRevenueData, balance: stringValue });
   };
 
   const handleChangeDescriptionNewExpense = (
@@ -292,7 +329,6 @@ export default function Dashboard() {
   const handleNewExpense = async () => {
     setLoadingNewExpense(true);
     try {
-      const numericValue = getNumericValue(balanceNewExpense);
       await api({
         method: "POST",
         url: "/expense/create",
@@ -302,7 +338,7 @@ export default function Dashboard() {
         },
         data: {
           id_bill: selectedBillExpense,
-          balance: numericValue,
+          balance: parseFloat(balanceNewExpense),
           description: descriptionNewExpense,
           status: statusNewExpense,
         },
@@ -354,6 +390,9 @@ export default function Dashboard() {
   const handleEditExpense = async () => {
     setLoadingEditExpense(true);
     try {
+      const formattedExpense = (
+        Number(updateExpenseData?.balance) * 100
+      ).toString();
       await api({
         method: "PATCH",
         url: `/expense/update/${updateExpenseData?.id}`,
@@ -363,15 +402,17 @@ export default function Dashboard() {
         },
         data: {
           ...updateExpenseData,
-          balance: updateExpenseData?.balance,
+          balance: parseFloat(formattedExpense),
           description: updateExpenseData?.description,
           status: updateExpenseData?.status,
         },
       });
-      setLoadingEditExpense(false);
 
+      setLoadingEditExpense(false);
       setOpenEditExpense(false);
       loadExpenseData();
+      calculateTotalBalanceBill();
+
       const successMessage = "Despesa atualizada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -397,6 +438,7 @@ export default function Dashboard() {
       setLoadingDeleteExpense(false);
       setOpenDeleteExpense(false);
       loadExpenseData();
+      calculateTotalBalanceBill();
       const successMessage = "Despesa excluída com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -407,8 +449,6 @@ export default function Dashboard() {
       notification(toast, errorMessage, "error");
     }
   };
-
-
 
   const handleNewRevenue = async () => {
     setLoadingNewRevenue(true);
@@ -423,7 +463,7 @@ export default function Dashboard() {
         },
         data: {
           id_bill: selectedBillRevenue,
-          balance: numericValue,
+          balance: parseFloat(balanceNewRevenue),
           description: descriptionNewRevenue,
           status: statusNewRevenue,
         },
@@ -461,13 +501,49 @@ export default function Dashboard() {
       setLoadingReceiveRevenue(false);
       setOpenReceiveRevenue(false);
       loadRevenueData();
+      calculateTotalBalanceBill();
       const successMessage = "Receita recebida com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingReceiveRevenue(false);
       setOpenReceiveRevenue(false);
       const errorMessage =
-        error?.response?.data?.error || "Não foi possível processar o recebimento da receita.";
+        error?.response?.data?.error ||
+        "Não foi possível processar o recebimento da receita.";
+      notification(toast, errorMessage, "error");
+    }
+  };
+
+  const handleEditRevenue = async () => {
+    setLoadingEditRevenue(true);
+    try {
+      const formattedRevenue = (
+        Number(updateRevenueData?.balance) * 100
+      ).toString();
+      await api({
+        method: "PATCH",
+        url: `/revenue/update/${updateRevenueData?.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+        data: {
+          balance: parseFloat(formattedRevenue),
+          description: updateRevenueData?.description,
+          status: updateRevenueData?.status,
+        },
+      });
+      setLoadingEditRevenue(false);
+      setOpenEditRevenue(false);
+      loadRevenueData();
+      calculateTotalBalanceBill();
+      const successMessage = "Receita atualizada com sucesso.";
+      notification(toast, successMessage, "success");
+    } catch (error: any) {
+      setLoadingEditRevenue(false);
+      setOpenEditRevenue(false);
+      const errorMessage =
+        error?.response?.data?.error || "Não foi possível atualizar a receita.";
       notification(toast, errorMessage, "error");
     }
   };
@@ -486,18 +562,17 @@ export default function Dashboard() {
       setLoadingDeleteRevenue(false);
       setOpenDeleteRevenue(false);
       loadRevenueData();
+      calculateTotalBalanceBill();
       const successMessage = "Receita excluída com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingDeleteRevenue(false);
       setOpenDeleteRevenue(false);
-      const errorMessage = error?.response?.data?.error || "Não foi possível excluir a receita.";
+      const errorMessage =
+        error?.response?.data?.error || "Não foi possível excluir a receita.";
       notification(toast, errorMessage, "error");
     }
   };
-
-
-
 
   const renderNewExpense = () => {
     return (
@@ -507,20 +582,14 @@ export default function Dashboard() {
           <ModalHeader>Nova Despesa</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl id="currency" mb="1.5rem">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "#f00" }}
-                fontSize="1.5rem"
-                color="#f00"
-                value={`R$ ${balanceNewExpense}`}
-                onChange={handleChangeBalanceNewExpense}
-              />
-            </FormControl>
+            <MoneyInput
+              value={balanceNewExpense}
+              onChange={handleChangeBalanceNewExpense}
+              color="red"
+            />
 
             <Input
+              mt="1.5rem"
               mb="1.5rem"
               variant="flushed"
               type="text"
@@ -622,25 +691,17 @@ export default function Dashboard() {
           <ModalHeader>Editar Despesa</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl id="currency" mb="2rem">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "#f00" }}
-                fontSize="1.5rem"
-                color="#f00"
-                value={`R$ ${updateExpenseData?.balance}`}
-                // onChange={(e) =>
-                //   setUpdateExpenseData({
-                //     ...updateExpenseData,
-                //     balance: e.target.value
-                //   })
-                // }
-              />
-            </FormControl>
+            <MoneyInput
+              value={(Number(updateExpenseData?.balance) * 100).toString()}
+              onChange={(value) => {
+                const formattedValue = Number(value) / 100;
+                handleChangeBalanceEditExpense(formattedValue.toString());
+              }}
+              color="red"
+            />
 
             <Input
+              mt="1.5rem"
               variant="flushed"
               type="text"
               placeholder="Descrição"
@@ -746,7 +807,7 @@ export default function Dashboard() {
           <ModalHeader>Nova Receita</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl id="currency" mb="2rem">
+            {/* <FormControl id="currency" mb="2rem">
               <Input
                 variant="flushed"
                 type="text"
@@ -754,12 +815,17 @@ export default function Dashboard() {
                 _placeholder={{ color: "green" }}
                 fontSize="1.5rem"
                 color="green"
-                value={`R$ ${balanceNewRevenue}`}
-                onChange={handleChangeBalanceNewRevenue}
-              />
-            </FormControl>
+                />
+              </FormControl> */}
+
+            <MoneyInput
+              value={balanceNewRevenue}
+              onChange={handleChangeBalanceNewRevenue}
+              color="green"
+            />
 
             <Input
+              mt="1.5rem"
               mb="1.5rem"
               variant="flushed"
               type="text"
@@ -792,7 +858,9 @@ export default function Dashboard() {
                   h="1rem"
                   mr="1rem"
                 />
-                <Text fontSize="1rem">Não foi recebida</Text>
+                <Text fontSize="1rem">
+                  {statusNewRevenue ? "Recebida" : "Não foi recebida"}
+                </Text>
               </div>
               <Switch
                 isChecked={statusNewRevenue}
@@ -867,18 +935,17 @@ export default function Dashboard() {
           <ModalHeader>Editar Receita</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl id="currency" mb="2rem">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "green" }}
-                fontSize="1.5rem"
-                color="green"
-              />
-            </FormControl>
+            <MoneyInput
+              value={(Number(updateRevenueData?.balance) * 100).toString()}
+              onChange={(value) => {
+                const formattedValue = Number(value) / 100;
+                handleChangeBalanceEditRevenue(formattedValue.toString());
+              }}
+              color="green"
+            />
 
             <Input
+              mt="1.5rem"
               variant="flushed"
               type="text"
               placeholder="Descrição"
@@ -895,15 +962,26 @@ export default function Dashboard() {
                   h="1rem"
                   mr="1rem"
                 />
-                <Text fontSize="1rem">Não foi recebida</Text>
+                <Text fontSize="1rem">
+                  {updateRevenueData?.status ? "Recebida" : "Não foi recebida"}
+                </Text>
               </div>
-              <Switch colorScheme="green" />
+              <Switch
+                isChecked={updateRevenueData?.status}
+                onChange={() =>
+                  setUpdateRevenueData({
+                    ...updateRevenueData,
+                    status: !updateRevenueData?.status,
+                  })
+                }
+                colorScheme="green"
+              />
             </DivSwitch>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="green" mr={3}>
-              Salvar
+            <Button onClick={handleEditRevenue} colorScheme="green" mr={3}>
+              {loadingEditRevenue ? "Salvando..." : "Salvar"}
             </Button>
             <Button onClick={() => setOpenEditRevenue(false)}>Cancelar</Button>
           </ModalFooter>
@@ -1056,7 +1134,9 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Saldo atual
                   </Text>
-                  <Text fontSize="1.5rem">R$ {totalBalanceBill.toFixed(2)}</Text>
+                  <Text fontSize="1.5rem">
+                    R$ {totalBalanceBill.toFixed(2)}
+                  </Text>
                 </CardLeft>
 
                 <CardRight>
@@ -1079,7 +1159,10 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Receitas
                   </Text>
-                  <Text fontSize="1.5rem"> R$ {totalBalanceRevenue.toFixed(2)}</Text>
+                  <Text fontSize="1.5rem">
+                    {" "}
+                    R$ {totalBalanceRevenue.toFixed(2)}
+                  </Text>
                 </CardLeft>
 
                 <CardRight>
@@ -1152,64 +1235,66 @@ export default function Dashboard() {
                   </Tr>
                 </Thead>
 
-                {expenseData.length !== 0 ? expenseData.map((expense: ExpenseData) => {
-                  return (
-                    <Tbody key={expense.id}>
-                      <Tr>
-                        <Td>
-                          {expense.status === false ? (
-                            <Text color="red">Pendente</Text>
-                          ) : (
-                            <Text color="green">Pago</Text>
-                          )}
-                        </Td>
-                        <Td isNumeric>
-                          {moment(expense.created_at).format("DD/MM/YYYY")}
-                        </Td>
-                        <Td>{expense.description}</Td>
-                        <Td color="#f00">R$ {expense.balance}</Td>
-                        <Td>
-                          <DivAcoes>
-                            <button
-                              onClick={() => {
-                                setOpenPayExpense(true);
-                                setUpdateExpenseData(expense);
-                              }}
-                              disabled={expense.status !== false}
-                            >
-                              <FiCheckCircle
-                                cursor="pointer"
-                                aria-label="Pay expense"
-                              />
-                            </button>
+                {expenseData.length !== 0 ? (
+                  expenseData.map((expense: ExpenseData) => {
+                    return (
+                      <Tbody key={expense.id}>
+                        <Tr>
+                          <Td>
+                            {expense.status === false ? (
+                              <Text color="red">Pendente</Text>
+                            ) : (
+                              <Text color="green">Pago</Text>
+                            )}
+                          </Td>
+                          <Td isNumeric>
+                            {moment(expense.created_at).format("DD/MM/YYYY")}
+                          </Td>
+                          <Td>{expense.description}</Td>
+                          <Td color="#f00">R$ {expense.balance}</Td>
+                          <Td>
+                            <DivAcoes>
+                              <button
+                                onClick={() => {
+                                  setOpenPayExpense(true);
+                                  setUpdateExpenseData(expense);
+                                }}
+                                disabled={expense.status !== false}
+                              >
+                                <FiCheckCircle
+                                  cursor="pointer"
+                                  aria-label="Pay expense"
+                                />
+                              </button>
 
-                            <Icon
-                              onClick={() => {
-                                setOpenEditExpense(true);
-                                setUpdateExpenseData(expense);
-                              }}
-                              cursor="pointer"
-                              as={FiEdit}
-                              w="1rem"
-                              h="1rem"
-                            />
-                            <Icon
-                              onClick={() => {
-                                setOpenDeleteExpense(true);
-                                setUpdateExpenseData(expense);
-                              }}
-                              cursor="pointer"
-                              as={AiOutlineDelete}
-                              w="1rem"
-                              h="1rem"
-                            />
-                          </DivAcoes>
-                        </Td>
-                      </Tr>
-                    </Tbody>
-                  );
-                }) : (
-                  <Text p='6'>Você não possui despesas cadastradas.</Text>
+                              <Icon
+                                onClick={() => {
+                                  setOpenEditExpense(true);
+                                  setUpdateExpenseData(expense);
+                                }}
+                                cursor="pointer"
+                                as={FiEdit}
+                                w="1rem"
+                                h="1rem"
+                              />
+                              <Icon
+                                onClick={() => {
+                                  setOpenDeleteExpense(true);
+                                  setUpdateExpenseData(expense);
+                                }}
+                                cursor="pointer"
+                                as={AiOutlineDelete}
+                                w="1rem"
+                                h="1rem"
+                              />
+                            </DivAcoes>
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    );
+                  })
+                ) : (
+                  <Text p="6">Você não possui despesas cadastradas.</Text>
                 )}
               </Table>
             </TableContainer>
@@ -1252,64 +1337,66 @@ export default function Dashboard() {
                   </Tr>
                 </Thead>
 
-                {revenueData.length !== 0 ? revenueData.map((revenue: RevenueData) => {
-                  return (
-                    <Tbody key={revenue.id}>
-                      <Tr>
-                        <Td>
-                          {revenue.status === false ? (
-                            <Text color="red">Pendente</Text>
-                          ) : (
-                            <Text color="green">Recebido</Text>
-                          )}
-                        </Td>
-                        <Td isNumeric>
-                          {moment(revenue.created_at).format("DD/MM/YYYY")}
-                        </Td>
-                        <Td>{revenue.description}</Td>
-                        <Td color="green">R$ {revenue.balance}</Td>
-                        <Td>
-                          <DivAcoes>
-                            <button
-                              onClick={() => {
-                                setOpenReceiveRevenue(true);
-                                setUpdateRevenueData(revenue);
-                              }}
-                              disabled={revenue.status !== false}
-                            >
-                              <FiCheckCircle
-                                cursor="pointer"
-                                aria-label="Pay expense"
-                              />
-                            </button>
+                {revenueData.length !== 0 ? (
+                  revenueData.map((revenue: RevenueData) => {
+                    return (
+                      <Tbody key={revenue.id}>
+                        <Tr>
+                          <Td>
+                            {revenue.status === false ? (
+                              <Text color="red">Pendente</Text>
+                            ) : (
+                              <Text color="green">Recebido</Text>
+                            )}
+                          </Td>
+                          <Td isNumeric>
+                            {moment(revenue.created_at).format("DD/MM/YYYY")}
+                          </Td>
+                          <Td>{revenue.description}</Td>
+                          <Td color="green">R$ {revenue.balance}</Td>
+                          <Td>
+                            <DivAcoes>
+                              <button
+                                onClick={() => {
+                                  setOpenReceiveRevenue(true);
+                                  setUpdateRevenueData(revenue);
+                                }}
+                                disabled={revenue.status !== false}
+                              >
+                                <FiCheckCircle
+                                  cursor="pointer"
+                                  aria-label="Pay expense"
+                                />
+                              </button>
 
-                            <Icon
-                              onClick={() => {
-                                setOpenEditRevenue(true);
-                                setUpdateRevenueData(revenue);
-                              }}
-                              cursor="pointer"
-                              as={FiEdit}
-                              w="1rem"
-                              h="1rem"
-                            />
-                            <Icon
-                              onClick={() => {
-                                setOpenDeleteRevenue(true);
-                                setUpdateRevenueData(revenue);
-                              }}
-                              cursor="pointer"
-                              as={AiOutlineDelete}
-                              w="1rem"
-                              h="1rem"
-                            />
-                          </DivAcoes>
-                        </Td>
-                      </Tr>
-                    </Tbody>
-                  );
-                }) : (
-                  <Text p='6'>Você não possui receitas cadastradas.</Text>
+                              <Icon
+                                onClick={() => {
+                                  setOpenEditRevenue(true);
+                                  setUpdateRevenueData(revenue);
+                                }}
+                                cursor="pointer"
+                                as={FiEdit}
+                                w="1rem"
+                                h="1rem"
+                              />
+                              <Icon
+                                onClick={() => {
+                                  setOpenDeleteRevenue(true);
+                                  setUpdateRevenueData(revenue);
+                                }}
+                                cursor="pointer"
+                                as={AiOutlineDelete}
+                                w="1rem"
+                                h="1rem"
+                              />
+                            </DivAcoes>
+                          </Td>
+                        </Tr>
+                      </Tbody>
+                    );
+                  })
+                ) : (
+                  <Text p="6">Você não possui receitas cadastradas.</Text>
                 )}
               </Table>
             </TableContainer>

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { StyledInput } from "./styles";
 
 interface MoneyInputProps {
   value: string;
   onChange: (value: string) => void;
+  color: string;
 }
 
-const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange }) => {
+const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange, color }) => {
 
   const formatCurrency = (value: string) => {
     const number = Number(value) / 100;
@@ -32,11 +34,12 @@ const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange }) => {
   };
 
   return (
-    <input
+    <StyledInput
       type="text"
       value={formattedValue}
       onChange={handleChange}
       placeholder="R$ 0,00"
+      color={color}
     />
   );
 };

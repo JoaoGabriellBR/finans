@@ -117,18 +117,6 @@ export default function MyBills() {
     setDescriptionNewBill(e.target.value);
   };
 
-  // const handleChangeBalanceEditBill = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const updatedBillData = { ...billDataUpdate };
-  //   updatedBillData.balance = formatCurrency(e.target.value);
-  //   setBillData(updatedBillData);
-  // };
-
-  // const handleChangeDescriptionEditBill = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const updatedBillData = { ...billDataUpdate };
-  //   updatedBillData.description = e.target.value;
-  //   setBillData(updatedBillData);
-  // };
-
   const handleChangeNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setBalanceNewExpense(formatCurrency(inputValue));
@@ -229,25 +217,15 @@ export default function MyBills() {
           <ModalHeader>Nova Conta</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <FormControl id="currency" mb="2rem">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "#00f" }}
-                fontSize="1.5rem"
-                color="#00f"
-                value={`R$ ${balanceNewBill}`}
-                onChange={handleChangeBalanceNewBill}
-              />
-            </FormControl> */}
 
             <MoneyInput
               value={balanceNewBill}
               onChange={handleChangeBalanceNewBill}
+              color="blue"
             />
 
             <Input
+              mt="1.5rem"
               variant="flushed"
               type="text"
               placeholder="Descrição (max 50 caracteres)"
