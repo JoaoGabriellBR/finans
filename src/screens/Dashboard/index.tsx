@@ -35,7 +35,6 @@ import {
   Th,
   Td,
   Tr,
-  FormControl,
   Input,
   Switch,
   Select,
@@ -48,7 +47,6 @@ import {
   ModalOverlay,
   useMediaQuery,
   useToast,
-  IconButton,
 } from "@chakra-ui/react";
 import { SiStarlingbank } from "react-icons/si";
 import {
@@ -63,7 +61,6 @@ import { useNavigate } from "react-router-dom";
 import SideMenu from "../../components/SideMenu";
 import handleLogout from "../../utils/handleLogout";
 import notification from "../../utils/toast";
-import { getNumericValue } from "../../utils/formatCurrency";
 import api from "../../api";
 import Cookies from "js-cookie";
 import moment from "moment";
@@ -147,22 +144,13 @@ export default function Dashboard() {
   const [openDeleteRevenue, setOpenDeleteRevenue] = useState(false);
 
   const [balanceNewExpense, setBalanceNewExpense] = useState("");
-  const [balanceEditExpense, setBalanceEditExpense] = useState("");
-
-  const [descriptionNewExpense, setDescriptionNewExpense] = useState("");
-  const [descriptionEditExpense, setDescriptionEditExpense] = useState("");
-
-  const [statusNewExpense, setStatusNewExpense] = useState(Boolean);
-  const [statusEditExpense, setStatusEditExpense] = useState(Boolean);
-
   const [balanceNewRevenue, setBalanceNewRevenue] = useState("");
-  const [balanceEditRevenue, setBalanceEditRevenue] = useState("");
-
+  
+  const [descriptionNewExpense, setDescriptionNewExpense] = useState("");
   const [descriptionNewRevenue, setDescriptionNewRevenue] = useState("");
-  const [descriptionEditRevenue, setDescriptionEditRevenue] = useState("");
-
+ 
+  const [statusNewExpense, setStatusNewExpense] = useState(Boolean);
   const [statusNewRevenue, setStatusNewRevenue] = useState(Boolean);
-  const [statusEditRevenue, setStatusEditRevenue] = useState(Boolean);
 
   const [totalBalanceBill, setTotalBalanceBill] = useState<number>(0);
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
@@ -247,7 +235,6 @@ export default function Dashboard() {
   const calculateTotalBalanceExpense = () => {
     const sum = expenseData.reduce((accumulator, expense) => {
       if (expense.balance !== undefined) {
-        // Verifica se expense.status é true e subtrai o valor de expense.balance do totalBalanceBill
         if (expense.status === true) {
           setTotalBalanceBill((prevTotal) => prevTotal - expense.balance);
         }
@@ -262,7 +249,6 @@ export default function Dashboard() {
   const calculateTotalBalanceRevenue = () => {
     const sum = revenueData.reduce((accumulator, revenue) => {
       if (revenue.balance !== undefined) {
-        // Verifica se revenue.status é true e adiciona o valor de revenue.balance ao totalBalanceBill
         if (revenue.status === true) {
           setTotalBalanceBill((prevTotal) => prevTotal + revenue.balance);
         }
@@ -356,7 +342,6 @@ export default function Dashboard() {
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingNewExpense(false);
-      setOpenNewExpense(false);
       const errorMessage = error?.response?.data?.error;
       notification(toast, errorMessage, "error");
     }
@@ -453,7 +438,6 @@ export default function Dashboard() {
   const handleNewRevenue = async () => {
     setLoadingNewRevenue(true);
     try {
-      const numericValue = getNumericValue(balanceNewRevenue);
       await api({
         method: "POST",
         url: "/revenue/create",
@@ -481,7 +465,6 @@ export default function Dashboard() {
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingNewRevenue(false);
-      setOpenNewRevenue(false);
       const errorMessage = error?.response?.data?.error;
       notification(toast, errorMessage, "error");
     }
