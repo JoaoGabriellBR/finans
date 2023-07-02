@@ -32,6 +32,8 @@ import {
   ModalOverlay,
   useMediaQuery,
   useToast,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -48,7 +50,7 @@ import handleLogout from "../../utils/handleLogout";
 import Cookies from "js-cookie";
 import api from "../../api";
 import notification from "../../utils/toast";
-import { formatCurrency, getNumericValue } from "../../utils/formatCurrency";
+import { formatCurrency } from "../../utils/formatCurrency";
 import MoneyInput from "../../components/MoneyInput";
 
 interface BillData {
@@ -56,6 +58,13 @@ interface BillData {
   description: string;
   balance: number;
 }
+
+interface UpdateBillData {
+  id?: number | undefined;
+  description?: string | undefined;
+  balance?: string | undefined;
+}
+
 
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
@@ -65,7 +74,7 @@ export default function MyBills() {
   const previousPage = -1;
 
   const [billData, setBillData] = useState<BillData[]>([]);
-  const [billDataUpdate, setBillDataUpdate]= useState([]);
+  const [updateBillData, setUpdateBillData] = useState<UpdateBillData>();
   const [billId, setBillId] = useState();
 
   const [loadingNewBill, setLoadingNewBill] = useState(false);
@@ -77,13 +86,10 @@ export default function MyBills() {
   const [openEditBill, setOpenEditBill] = useState(false);
   const [openDeleteBill, setOpenDeleteBill] = useState(false);
 
+  const [balanceNewBill, setBalanceNewBill] = useState("");
   const [balanceNewExpense, setBalanceNewExpense] = useState("");
 
-  const [balanceNewBill, setBalanceNewBill] = useState("");
-  const [balanceEditBill, setBalanceEditBill] = useState("");
-
   const [descriptionNewBill, setDescriptionNewBill] = useState("");
-  const [descriptionEditBill, setDescriptionEditBill] = useState("");
 
   const loadData = async () => {
     try {
@@ -107,14 +113,21 @@ export default function MyBills() {
   }, []);
 
   const handleChangeBalanceNewBill = (value: string) => {
-    const rawValue = value.replace(/[^\d]/g, '');
+    const rawValue = value.replace(/[^\d]/g, "");
     const floatValue = parseFloat(rawValue) / 100;
     const stringValue = floatValue.toString();
     setBalanceNewBill(stringValue);
   };
-  
+
   const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
     setDescriptionNewBill(e.target.value);
+  };
+
+  const handleChangeBalanceEditBill = (value: string) => {
+    const rawValue = value.replace(/[^\d]/g, "");
+    const floatValue = parseFloat(rawValue) / 100;
+    const stringValue = floatValue.toString();
+    setUpdateBillData({ ...updateBillData, balance: stringValue });
   };
 
   const handleChangeNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +158,6 @@ export default function MyBills() {
       notification(toast, successMessage, "success");
     } catch (error: any) {
       setLoadingNewBill(false);
-      setOpenNewBill(false);
       const errorMessage = error?.response?.data?.error;
       notification(toast, errorMessage, "error");
     }
@@ -154,7 +166,7 @@ export default function MyBills() {
   const handleEditBill = async () => {
     setLoadingEditBill(true);
     try {
-      const numericValue = getNumericValue(billDataUpdate.balance.toString());
+      const formattedBill = (Number(updateBillData?.balance) * 100).toString();
       await api({
         method: "PATCH",
         url: `/bill/update/${billId}`,
@@ -163,9 +175,9 @@ export default function MyBills() {
           Authorization: Cookies.get("finans-authtoken"),
         },
         data: {
-          ...billDataUpdate,
-          balance: numericValue,
-          description: billDataUpdate.description,
+          ...updateBillData,
+          balance: parseFloat(formattedBill),
+          description: updateBillData?.description,
         },
       });
 
@@ -177,13 +189,14 @@ export default function MyBills() {
     } catch (error: any) {
       console.log(error);
       setLoadingEditBill(false);
-      setOpenEditBill(false);
-      const errorMessage = error?.response?.data?.error || "Ocorreu um erro ao atualizar a conta.";
+      const errorMessage =
+        error?.response?.data?.error || "Ocorreu um erro ao atualizar a conta.";
       notification(toast, errorMessage, "error");
     }
-  }
+  };
 
   const handleDeleteBill = async () => {
+    setLoadingDeleteBill(true);
     try {
       await api({
         method: "PATCH",
@@ -217,7 +230,6 @@ export default function MyBills() {
           <ModalHeader>Nova Conta</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-
             <MoneyInput
               value={balanceNewBill}
               onChange={handleChangeBalanceNewBill}
@@ -254,32 +266,24 @@ export default function MyBills() {
           <ModalHeader>Editar Conta </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl id="currency" mb="2rem">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "#00f" }}
-                fontSize="1.5rem"
-                color="#00f"
-                value={`R$ ${billDataUpdate.balance}`}
-                onChange={(e) => {
-                  setBillDataUpdate((prevBillData) => ({
-                    ...prevBillData,
-                    balance: formatCurrency(e.target.value),
-                  }));
-                }}
-              />
-            </FormControl>
+            <MoneyInput
+              value={(Number(updateBillData?.balance) * 100).toString()}
+              onChange={(value) => {
+                const formattedValue = Number(value) / 100;
+                handleChangeBalanceEditBill(formattedValue.toString());
+              }}
+              color="blue"
+            />
 
             <Input
+              mt="1.5rem"
               variant="flushed"
               type="text"
               placeholder="Descrição (max 50 caracteres)"
               maxLength={500}
-              value={billDataUpdate.description}
+              value={updateBillData?.description}
               onChange={(e) => {
-                setBillDataUpdate((prevBillData) => ({
+                setUpdateBillData((prevBillData) => ({
                   ...prevBillData,
                   description: e.target.value,
                 }));
@@ -307,7 +311,11 @@ export default function MyBills() {
           <ModalCloseButton />
 
           <ModalBody pb={6}>
-            <Text fontSize="1rem">
+            <Alert status="error" >
+              <AlertIcon />
+              Todas as suas Despesas e Receitas serão apagadas.
+            </Alert>
+            <Text fontSize="1rem" mt="1.5rem">
               Tem certeza que deseja remover essa conta? Esta ação não poderá
               ser desfeita!
             </Text>
@@ -315,7 +323,7 @@ export default function MyBills() {
 
           <ModalFooter>
             <Button onClick={handleDeleteBill} colorScheme="red" mr={3}>
-              Excluir
+              {loadingDeleteBill ? "Excluindo" : "Excluir"}
             </Button>
             <Button onClick={() => setOpenDeleteBill(false)}>Cancelar</Button>
           </ModalFooter>
@@ -461,8 +469,7 @@ export default function MyBills() {
                         <MenuItem
                           onClick={() => {
                             setOpenEditBill(true);
-                            setBillDataUpdate(bill);
-                            console.log(billDataUpdate);
+                            setUpdateBillData(bill);
                           }}
                         >
                           <Icon as={AiOutlineEdit} mr="1rem" />
@@ -484,10 +491,17 @@ export default function MyBills() {
                   </Text>
                 </Box>
 
-                <Box className="div-saldo-previsto" mb="2rem">
-                  <Text fontSize="0.9rem">Saldo previsto</Text>
+                <Box className="div-saldo-previsto" mb="1rem">
+                  <Text fontSize="0.9rem">Total de despesas</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
-                    R$ 500,00
+                    {bill?.expenses?.length} despesas
+                  </Text>
+                </Box>
+
+                <Box className="div-saldo-previsto" mb="2rem">
+                  <Text fontSize="0.9rem">Total de receitas</Text>
+                  <Text as="b" color="green" fontSize="0.9rem">
+                    {bill?.revenues?.length} receitas
                   </Text>
                 </Box>
 
