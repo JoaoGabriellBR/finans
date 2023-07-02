@@ -1,8 +1,8 @@
-export const formatCurrency = (value: any) => {
+export const formatCurrency = (value: string) => {
   const numericValue = parseInt(value.replace(/\D/g, ""));
 
-  const formattedValue = (numericValue / 100).toLocaleString("pt-BR", {
-    // style: "currency",
+  const formattedValue = numericValue.toLocaleString("pt-BR", {
+    style: "currency",
     currency: "BRL",
   });
 

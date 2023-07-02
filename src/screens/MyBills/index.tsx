@@ -65,7 +65,6 @@ interface UpdateBillData {
   balance?: string | undefined;
 }
 
-
 export default function MyBills() {
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
   const toast = useToast();
@@ -128,11 +127,6 @@ export default function MyBills() {
     const floatValue = parseFloat(rawValue) / 100;
     const stringValue = floatValue.toString();
     setUpdateBillData({ ...updateBillData, balance: stringValue });
-  };
-
-  const handleChangeNewExpense = (e: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    setBalanceNewExpense(formatCurrency(inputValue));
   };
 
   const handleNewBill = async () => {
@@ -311,7 +305,7 @@ export default function MyBills() {
           <ModalCloseButton />
 
           <ModalBody pb={6}>
-            <Alert status="error" >
+            <Alert status="error">
               <AlertIcon />
               Todas as suas Despesas e Receitas serão apagadas.
             </Alert>
@@ -332,64 +326,9 @@ export default function MyBills() {
     );
   };
 
-  const renderNewExpense = () => {
-    return (
-      <Modal isOpen={openNewExpense} onClose={() => setOpenNewExpense(false)}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Nova Despesa</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl id="currency" mb="2rem">
-              <Input
-                variant="flushed"
-                type="text"
-                value={balanceNewExpense}
-                onChange={handleChangeNewExpense}
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "#f00" }}
-                fontSize="1.5rem"
-                color="#f00"
-              />
-            </FormControl>
-
-            <Input
-              variant="flushed"
-              type="text"
-              placeholder="Descrição (max 50 caracteres)"
-              maxLength={500}
-            />
-
-            <DivSwitch>
-              <div className="div-switch-icon">
-                <Icon
-                  cursor="pointer"
-                  as={FiCheckCircle}
-                  w="1rem"
-                  h="1rem"
-                  mr="1rem"
-                />
-                <Text fontSize="1rem">Não foi paga</Text>
-              </div>
-              <Switch colorScheme="red" />
-            </DivSwitch>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="red" mr={3}>
-              Salvar
-            </Button>
-            <Button onClick={() => setOpenNewExpense(false)}>Cancelar</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    );
-  };
-
   return (
     <>
       {renderNewBill()}
-      {renderNewExpense()}
       {renderEditBill()}
       {renderDeleteBill()}
       <Container>
@@ -487,31 +426,25 @@ export default function MyBills() {
                 <Box className="div-saldo-atual" mb="1rem">
                   <Text fontSize="0.9rem">Saldo atual</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
-                    R$ {bill?.balance}
+                    {formatCurrency(bill?.balance.toString())}
                   </Text>
                 </Box>
 
                 <Box className="div-saldo-previsto" mb="1rem">
                   <Text fontSize="0.9rem">Total de despesas</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
-                    {bill?.expenses?.length} despesas
+                    {bill?.expenses?.length}{" "}
+                    {bill?.expenses?.length > 1 ? "despesas" : "despesa"}
                   </Text>
                 </Box>
 
                 <Box className="div-saldo-previsto" mb="2rem">
                   <Text fontSize="0.9rem">Total de receitas</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
-                    {bill?.revenues?.length} receitas
+                    {bill?.revenues?.length}{" "}
+                    {bill?.revenues?.length > 1 ? "receitas" : "receita"}
                   </Text>
                 </Box>
-
-                <Button
-                  onClick={() => setOpenNewExpense(true)}
-                  alignSelf="flex-end"
-                  variant="ghost"
-                >
-                  Adicionar despesa
-                </Button>
               </CardContas>
             ))}
           </DivCards>

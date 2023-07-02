@@ -38,6 +38,7 @@ import {
   Input,
   Switch,
   Select,
+  IconButton,
   Modal,
   ModalHeader,
   ModalBody,
@@ -64,6 +65,7 @@ import notification from "../../utils/toast";
 import api from "../../api";
 import Cookies from "js-cookie";
 import moment from "moment";
+import { formatCurrency } from "../../utils/formatCurrency";
 import MoneyInput from "../../components/MoneyInput";
 
 interface BillData {
@@ -145,10 +147,10 @@ export default function Dashboard() {
 
   const [balanceNewExpense, setBalanceNewExpense] = useState("");
   const [balanceNewRevenue, setBalanceNewRevenue] = useState("");
-  
+
   const [descriptionNewExpense, setDescriptionNewExpense] = useState("");
   const [descriptionNewRevenue, setDescriptionNewRevenue] = useState("");
- 
+
   const [statusNewExpense, setStatusNewExpense] = useState(Boolean);
   const [statusNewRevenue, setStatusNewRevenue] = useState(Boolean);
 
@@ -236,7 +238,7 @@ export default function Dashboard() {
     const sum = expenseData.reduce((accumulator, expense) => {
       if (expense.balance !== undefined) {
         if (expense.status === true) {
-          setTotalBalanceBill((prevTotal) => prevTotal - expense.balance);
+          setTotalBalanceBill((prevTotal) => prevTotal - expense?.balance);
         }
         return accumulator + expense.balance;
       } else {
@@ -605,7 +607,9 @@ export default function Dashboard() {
                   h="1rem"
                   mr="1rem"
                 />
-                <Text fontSize="1rem">Não foi paga</Text>
+                <Text fontSize="1rem">
+                  {statusNewExpense ? "Paga" : "Não foi paga"}
+                </Text>
               </div>
               <Switch
                 isChecked={statusNewExpense}
@@ -619,7 +623,17 @@ export default function Dashboard() {
             <Button onClick={handleNewExpense} colorScheme="red" mr={3}>
               {loadingNewExpense ? "Salvando..." : "Salvar"}
             </Button>
-            <Button onClick={() => setOpenNewExpense(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setOpenNewExpense(false);
+                setBalanceNewExpense("");
+                setDescriptionNewExpense("");
+                setSelectedBillExpense("");
+                setStatusNewExpense(false);
+              }}
+            >
+              Cancelar
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -708,7 +722,7 @@ export default function Dashboard() {
                   mr="1rem"
                 />
                 <Text fontSize="1rem">
-                  {updateExpenseData?.status ? "Pago" : "Não foi paga"}
+                  {updateExpenseData?.status ? "Paga" : "Não foi paga"}
                 </Text>
               </div>
               <Switch
@@ -790,17 +804,6 @@ export default function Dashboard() {
           <ModalHeader>Nova Receita</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <FormControl id="currency" mb="2rem">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="R$ 0,00"
-                _placeholder={{ color: "green" }}
-                fontSize="1.5rem"
-                color="green"
-                />
-              </FormControl> */}
-
             <MoneyInput
               value={balanceNewRevenue}
               onChange={handleChangeBalanceNewRevenue}
@@ -857,7 +860,17 @@ export default function Dashboard() {
             <Button onClick={handleNewRevenue} colorScheme="green" mr={3}>
               {loadingNewRevenue ? "Salvando..." : "Salvar"}
             </Button>
-            <Button onClick={() => setOpenNewRevenue(false)}>Cancelar</Button>
+            <Button
+              onClick={() => {
+                setOpenNewRevenue(false);
+                setBalanceNewRevenue("");
+                setDescriptionNewRevenue("");
+                setSelectedBillRevenue("");
+                setStatusNewRevenue(false);
+              }}
+            >
+              Cancelar
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -933,7 +946,13 @@ export default function Dashboard() {
               type="text"
               placeholder="Descrição"
               maxLength={500}
-              value="Receita de teste"
+              value={updateRevenueData?.description}
+              onChange={(e) =>
+                setUpdateRevenueData({
+                  ...updateRevenueData,
+                  description: e.target.value,
+                })
+              }
             />
 
             <DivSwitch>
@@ -1118,7 +1137,7 @@ export default function Dashboard() {
                     Saldo atual
                   </Text>
                   <Text fontSize="1.5rem">
-                    R$ {totalBalanceBill.toFixed(2)}
+                    {formatCurrency(totalBalanceBill.toString())}
                   </Text>
                 </CardLeft>
 
@@ -1144,7 +1163,7 @@ export default function Dashboard() {
                   </Text>
                   <Text fontSize="1.5rem">
                     {" "}
-                    R$ {totalBalanceRevenue.toFixed(2)}
+                    {formatCurrency(totalBalanceRevenue.toString())}
                   </Text>
                 </CardLeft>
 
@@ -1169,7 +1188,7 @@ export default function Dashboard() {
                     Despesas
                   </Text>
                   <Text fontSize="1.5rem">
-                    R$ {totalBalanceExpense.toFixed(2)}
+                    {formatCurrency(totalBalanceExpense.toString())}
                   </Text>
                 </CardLeft>
 
@@ -1227,49 +1246,72 @@ export default function Dashboard() {
                             {expense.status === false ? (
                               <Text color="red">Pendente</Text>
                             ) : (
-                              <Text color="green">Pago</Text>
+                              <Text color="green">Paga</Text>
                             )}
                           </Td>
                           <Td isNumeric>
                             {moment(expense.created_at).format("DD/MM/YYYY")}
                           </Td>
                           <Td>{expense.description}</Td>
-                          <Td color="#f00">R$ {expense.balance}</Td>
+                          <Td color="#f00">
+                            {formatCurrency(expense?.balance?.toString())}
+                          </Td>
                           <Td>
                             <DivAcoes>
-                              <button
-                                onClick={() => {
-                                  setOpenPayExpense(true);
-                                  setUpdateExpenseData(expense);
-                                }}
-                                disabled={expense.status !== false}
+                              <Tooltip
+                                label="Pagar despesa"
+                                aria-label="A tooltip"
                               >
-                                <FiCheckCircle
-                                  cursor="pointer"
-                                  aria-label="Pay expense"
-                                />
-                              </button>
+                                <IconButton
+                                  aria-label="Icon Button"
+                                  onClick={() => {
+                                    setOpenPayExpense(true);
+                                    setUpdateExpenseData(expense);
+                                  }}
+                                  isDisabled={expense.status !== false}
+                                >
+                                  <FiCheckCircle
+                                    cursor="pointer"
+                                    aria-label="Pay expense"
+                                  />
+                                </IconButton>
+                              </Tooltip>
 
-                              <Icon
-                                onClick={() => {
-                                  setOpenEditExpense(true);
-                                  setUpdateExpenseData(expense);
-                                }}
-                                cursor="pointer"
-                                as={FiEdit}
-                                w="1rem"
-                                h="1rem"
-                              />
-                              <Icon
-                                onClick={() => {
-                                  setOpenDeleteExpense(true);
-                                  setUpdateExpenseData(expense);
-                                }}
-                                cursor="pointer"
-                                as={AiOutlineDelete}
-                                w="1rem"
-                                h="1rem"
-                              />
+                              <Tooltip
+                                label="Editar despesa"
+                                aria-label="A tooltip"
+                              >
+                                <IconButton
+                                  aria-label="Icon Button"
+                                  onClick={() => {
+                                    setOpenEditExpense(true);
+                                    setUpdateExpenseData(expense);
+                                  }}
+                                >
+                                  <FiEdit
+                                    cursor="pointer"
+                                    aria-label="Edit expense"
+                                  />
+                                </IconButton>
+                              </Tooltip>
+
+                              <Tooltip
+                                label="Excluir despesa"
+                                aria-label="A tooltip"
+                              >
+                                <IconButton
+                                  aria-label="Icon Button"
+                                  onClick={() => {
+                                    setOpenDeleteExpense(true);
+                                    setUpdateExpenseData(expense);
+                                  }}
+                                >
+                                  <AiOutlineDelete
+                                    cursor="pointer"
+                                    aria-label="Delete expense"
+                                  />
+                                </IconButton>
+                              </Tooltip>
                             </DivAcoes>
                           </Td>
                         </Tr>
@@ -1300,10 +1342,6 @@ export default function Dashboard() {
           </DivTitleReceitas>
 
           <DivReceitas>
-            <Text fontSize="1rem" mb="2rem">
-              Junho de 2023
-            </Text>
-
             <TableContainer width="100%">
               <Table variant="simple">
                 <Thead>
@@ -1329,49 +1367,72 @@ export default function Dashboard() {
                             {revenue.status === false ? (
                               <Text color="red">Pendente</Text>
                             ) : (
-                              <Text color="green">Recebido</Text>
+                              <Text color="green">Recebida</Text>
                             )}
                           </Td>
                           <Td isNumeric>
                             {moment(revenue.created_at).format("DD/MM/YYYY")}
                           </Td>
                           <Td>{revenue.description}</Td>
-                          <Td color="green">R$ {revenue.balance}</Td>
+                          <Td color="green">
+                            {formatCurrency(revenue?.balance?.toString())}
+                          </Td>
                           <Td>
                             <DivAcoes>
-                              <button
-                                onClick={() => {
-                                  setOpenReceiveRevenue(true);
-                                  setUpdateRevenueData(revenue);
-                                }}
-                                disabled={revenue.status !== false}
+                              <Tooltip
+                                label="Receber receita"
+                                aria-label="A tooltip"
                               >
-                                <FiCheckCircle
-                                  cursor="pointer"
-                                  aria-label="Pay expense"
-                                />
-                              </button>
+                                <IconButton
+                                  aria-label="Icon Button"
+                                  onClick={() => {
+                                    setOpenReceiveRevenue(true);
+                                    setUpdateRevenueData(revenue);
+                                  }}
+                                  isDisabled={revenue.status !== false}
+                                >
+                                  <FiCheckCircle
+                                    cursor="pointer"
+                                    aria-label="Receive revenue"
+                                  />
+                                </IconButton>
+                              </Tooltip>
 
-                              <Icon
-                                onClick={() => {
-                                  setOpenEditRevenue(true);
-                                  setUpdateRevenueData(revenue);
-                                }}
-                                cursor="pointer"
-                                as={FiEdit}
-                                w="1rem"
-                                h="1rem"
-                              />
-                              <Icon
-                                onClick={() => {
-                                  setOpenDeleteRevenue(true);
-                                  setUpdateRevenueData(revenue);
-                                }}
-                                cursor="pointer"
-                                as={AiOutlineDelete}
-                                w="1rem"
-                                h="1rem"
-                              />
+                              <Tooltip
+                                label="Editar receita"
+                                aria-label="A tooltip"
+                              >
+                                <IconButton
+                                  aria-label="Icon Button"
+                                  onClick={() => {
+                                    setOpenEditRevenue(true);
+                                    setUpdateRevenueData(revenue);
+                                  }}
+                                >
+                                  <FiEdit
+                                    cursor="pointer"
+                                    aria-label="Edit revenue"
+                                  />
+                                </IconButton>
+                              </Tooltip>
+
+                              <Tooltip
+                                label="Excluir receita"
+                                aria-label="A tooltip"
+                              >
+                                <IconButton
+                                  aria-label="Icon Button"
+                                  onClick={() => {
+                                    setOpenDeleteRevenue(true);
+                                    setUpdateRevenueData(revenue);
+                                  }}
+                                >
+                                  <AiOutlineDelete
+                                    cursor="pointer"
+                                    aria-label="Delete revenue"
+                                  />
+                                </IconButton>
+                              </Tooltip>
                             </DivAcoes>
                           </Td>
                         </Tr>
