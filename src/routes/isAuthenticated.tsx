@@ -15,7 +15,7 @@ const AuthenticatedRoute = ({
   ...props
 }: AuthenticatedRouteProps) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const checkAuthentication = async () => {

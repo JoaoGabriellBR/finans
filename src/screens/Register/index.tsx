@@ -23,12 +23,12 @@ export default function Register() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const [loadingRegister, setLoadingRegister] = useState(false);
+  const [loadingRegister, setLoadingRegister] = useState<boolean>(false);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);

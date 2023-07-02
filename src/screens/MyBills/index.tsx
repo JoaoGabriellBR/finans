@@ -89,17 +89,17 @@ export default function MyBills() {
   const [updateBillData, setUpdateBillData] = useState<UpdateBillData>();
   const [billId, setBillId] = useState();
 
-  const [loadingNewBill, setLoadingNewBill] = useState(false);
-  const [loadingEditBill, setLoadingEditBill] = useState(false);
-  const [loadingDeleteBill, setLoadingDeleteBill] = useState(false);
+  const [loadingNewBill, setLoadingNewBill] = useState<boolean>(false);
+  const [loadingEditBill, setLoadingEditBill] = useState<boolean>(false);
+  const [loadingDeleteBill, setLoadingDeleteBill] = useState<boolean>(false);
 
-  const [openNewBill, setOpenNewBill] = useState(false);
-  const [openEditBill, setOpenEditBill] = useState(false);
-  const [openDeleteBill, setOpenDeleteBill] = useState(false);
+  const [openNewBill, setOpenNewBill] = useState<boolean>(false);
+  const [openEditBill, setOpenEditBill] = useState<boolean>(false);
+  const [openDeleteBill, setOpenDeleteBill] = useState<boolean>(false);
 
-  const [balanceNewBill, setBalanceNewBill] = useState("");
+  const [balanceNewBill, setBalanceNewBill] = useState<string>("");
 
-  const [descriptionNewBill, setDescriptionNewBill] = useState("");
+  const [descriptionNewBill, setDescriptionNewBill] = useState<string>("");
   const [totalBalanceBill, setTotalBalanceBill] = useState<number>(0);
 
   const loadData = async () => {
@@ -225,7 +225,6 @@ export default function MyBills() {
       const successMessage = "Conta atualizada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
-      console.log(error);
       setLoadingEditBill(false);
       const errorMessage =
         error?.response?.data?.error || "Ocorreu um erro ao atualizar a conta.";

@@ -113,17 +113,17 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [loadingNewExpense, setLoadingNewExpense] = useState(false);
-  const [loadingNewRevenue, setLoadingNewRevenue] = useState(false);
+  const [loadingNewExpense, setLoadingNewExpense] = useState<boolean>(false);
+  const [loadingNewRevenue, setLoadingNewRevenue] = useState<boolean>(false);
 
-  const [loadingPayExpense, setLoadingPayExpense] = useState(false);
-  const [loadingReceiveRevenue, setLoadingReceiveRevenue] = useState(false);
+  const [loadingPayExpense, setLoadingPayExpense] = useState<boolean>(false);
+  const [loadingReceiveRevenue, setLoadingReceiveRevenue] = useState<boolean>(false);
 
-  const [loadingEditExpense, setLoadingEditExpense] = useState(false);
-  const [loadingEditRevenue, setLoadingEditRevenue] = useState(false);
+  const [loadingEditExpense, setLoadingEditExpense] = useState<boolean>(false);
+  const [loadingEditRevenue, setLoadingEditRevenue] = useState<boolean>(false);
 
-  const [loadingDeleteExpense, setLoadingDeleteExpense] = useState(false);
-  const [loadingDeleteRevenue, setLoadingDeleteRevenue] = useState(false);
+  const [loadingDeleteExpense, setLoadingDeleteExpense] = useState<boolean>(false);
+  const [loadingDeleteRevenue, setLoadingDeleteRevenue] = useState<boolean>(false);
 
   const [billData, setBillData] = useState<BillData[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
@@ -137,24 +137,24 @@ export default function Dashboard() {
   const [selectedBillExpense, setSelectedBillExpense] = useState<string>("");
   const [selectedBillRevenue, setSelectedBillRevenue] = useState<string>("");
 
-  const [openNewExpense, setOpenNewExpense] = useState(false);
-  const [openPayExpense, setOpenPayExpense] = useState(false);
-  const [openEditExpense, setOpenEditExpense] = useState(false);
-  const [openDeleteExpense, setOpenDeleteExpense] = useState(false);
+  const [openNewExpense, setOpenNewExpense] = useState<boolean>(false);
+  const [openPayExpense, setOpenPayExpense] = useState<boolean>(false);
+  const [openEditExpense, setOpenEditExpense] = useState<boolean>(false);
+  const [openDeleteExpense, setOpenDeleteExpense] = useState<boolean>(false);
 
-  const [openNewRevenue, setOpenNewRevenue] = useState(false);
-  const [openReceiveRevenue, setOpenReceiveRevenue] = useState(false);
-  const [openEditRevenue, setOpenEditRevenue] = useState(false);
-  const [openDeleteRevenue, setOpenDeleteRevenue] = useState(false);
+  const [openNewRevenue, setOpenNewRevenue] = useState<boolean>(false);
+  const [openReceiveRevenue, setOpenReceiveRevenue] = useState<boolean>(false);
+  const [openEditRevenue, setOpenEditRevenue] = useState<boolean>(false);
+  const [openDeleteRevenue, setOpenDeleteRevenue] = useState<boolean>(false);
 
-  const [balanceNewExpense, setBalanceNewExpense] = useState("");
-  const [balanceNewRevenue, setBalanceNewRevenue] = useState("");
+  const [balanceNewExpense, setBalanceNewExpense] = useState<string>("");
+  const [balanceNewRevenue, setBalanceNewRevenue] = useState<string>("");
 
-  const [descriptionNewExpense, setDescriptionNewExpense] = useState("");
-  const [descriptionNewRevenue, setDescriptionNewRevenue] = useState("");
+  const [descriptionNewExpense, setDescriptionNewExpense] = useState<string>("");
+  const [descriptionNewRevenue, setDescriptionNewRevenue] = useState<string>("");
 
-  const [statusNewExpense, setStatusNewExpense] = useState(Boolean);
-  const [statusNewRevenue, setStatusNewRevenue] = useState(Boolean);
+  const [statusNewExpense, setStatusNewExpense] = useState<boolean>(Boolean);
+  const [statusNewRevenue, setStatusNewRevenue] = useState<boolean>(Boolean);
 
   const [totalBalanceBill, setTotalBalanceBill] = useState<number>(0);
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);

@@ -47,16 +47,16 @@ export default function Profile() {
 
   const toast = useToast();
 
-  const [loadingUpdateUser, setLoadingUpdateUser] = useState(false);
-  const [loadingChangePassword, setLoadingChangePassword] = useState(false);
+  const [loadingUpdateUser, setLoadingUpdateUser] = useState<boolean>(false);
+  const [loadingChangePassword, setLoadingChangePassword] = useState<boolean>(false);
 
   const [userData, setUserData] = useState<UserData | undefined>();
 
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
 
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState<boolean>(false);
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
 
   const loadUserData = async () => {
     const response = await api({

@@ -25,11 +25,11 @@ export default function Login() {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [loadingLogin, setLoadingLogin] = useState(false);
+  const [loadingLogin, setLoadingLogin] = useState<boolean>(false);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -54,7 +54,6 @@ export default function Login() {
       navigate("/dashboard");
     } catch (error: any) {
       setLoadingLogin(false);
-      console.log(error.message);
       const errorMessage = error?.response?.data?.error;
       notification(toast, errorMessage, "error");
     }
