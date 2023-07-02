@@ -7,7 +7,6 @@ import {
   DivCards,
   CardNovaConta,
   CardContas,
-  DivSwitch,
 } from "./styles";
 import {
   Text,
@@ -20,8 +19,6 @@ import {
   Button,
   Icon,
   Box,
-  FormControl,
-  Switch,
   Input,
   Modal,
   ModalHeader,
@@ -45,7 +42,7 @@ import {
 import { RxExit } from "react-icons/rx";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaMoneyCheckAlt } from "react-icons/fa";
-import { FiMoreHorizontal, FiCheckCircle } from "react-icons/fi";
+import { FiMoreHorizontal } from "react-icons/fi";
 import handleLogout from "../../utils/handleLogout";
 import Cookies from "js-cookie";
 import api from "../../api";
@@ -53,10 +50,24 @@ import notification from "../../utils/toast";
 import { formatCurrency } from "../../utils/formatCurrency";
 import MoneyInput from "../../components/MoneyInput";
 
+interface Revenue {
+  id: number;
+  balance: number;
+  status: boolean;
+}
+
+interface Expense {
+  id: number;
+  balance: number;
+  status: boolean;
+}
+
 interface BillData {
   id: number;
   description: string;
   balance: number;
+  revenues?: Revenue[];
+  expenses?: Expense[];
 }
 
 interface UpdateBillData {
@@ -80,15 +91,14 @@ export default function MyBills() {
   const [loadingEditBill, setLoadingEditBill] = useState(false);
   const [loadingDeleteBill, setLoadingDeleteBill] = useState(false);
 
-  const [openNewExpense, setOpenNewExpense] = useState(false);
   const [openNewBill, setOpenNewBill] = useState(false);
   const [openEditBill, setOpenEditBill] = useState(false);
   const [openDeleteBill, setOpenDeleteBill] = useState(false);
 
   const [balanceNewBill, setBalanceNewBill] = useState("");
-  const [balanceNewExpense, setBalanceNewExpense] = useState("");
 
   const [descriptionNewBill, setDescriptionNewBill] = useState("");
+  const [totalBalanceBill, setTotalBalanceBill] = useState<number>(0);
 
   const loadData = async () => {
     try {
@@ -111,15 +121,43 @@ export default function MyBills() {
     loadData();
   }, []);
 
+  const calculateTotalBalances = () => {
+    let totalBalanceBill = 0;
+
+    billData.forEach((bill) => {
+      if (bill.balance !== undefined) {
+        totalBalanceBill += bill.balance;
+
+        if (bill.revenues) {
+          bill.revenues.forEach((revenue: any) => {
+            if (revenue.balance !== undefined && revenue.status === true) {
+              totalBalanceBill += revenue.balance;
+            }
+          });
+        }
+
+        if (bill.expenses) {
+          bill.expenses.forEach((expense: any) => {
+            if (expense.balance !== undefined && expense.status === true) {
+              totalBalanceBill -= expense.balance;
+            }
+          });
+        }
+      }
+    });
+
+    setTotalBalanceBill(totalBalanceBill);
+  };
+
+  useEffect(() => {
+    calculateTotalBalances();
+  }, [billData]);
+
   const handleChangeBalanceNewBill = (value: string) => {
     const rawValue = value.replace(/[^\d]/g, "");
     const floatValue = parseFloat(rawValue) / 100;
     const stringValue = floatValue.toString();
     setBalanceNewBill(stringValue);
-  };
-
-  const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
-    setDescriptionNewBill(e.target.value);
   };
 
   const handleChangeBalanceEditBill = (value: string) => {
@@ -128,6 +166,11 @@ export default function MyBills() {
     const stringValue = floatValue.toString();
     setUpdateBillData({ ...updateBillData, balance: stringValue });
   };
+
+  const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
+    setDescriptionNewBill(e.target.value);
+  };
+
 
   const handleNewBill = async () => {
     setLoadingNewBill(true);
@@ -325,7 +368,7 @@ export default function MyBills() {
       </Modal>
     );
   };
-  
+
   return (
     <>
       {renderNewBill()}
@@ -424,9 +467,16 @@ export default function MyBills() {
                 </Box>
 
                 <Box className="div-saldo-atual" mb="1rem">
-                  <Text fontSize="0.9rem">Saldo atual</Text>
+                  <Text fontSize="0.9rem">Saldo total</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
                     {formatCurrency(bill?.balance.toString())}
+                  </Text>
+                </Box>
+
+                <Box className="div-saldo-atual" mb="1rem">
+                  <Text fontSize="0.9rem">Saldo previsto</Text>
+                  <Text as="b" color="green" fontSize="0.9rem">
+                    {formatCurrency(totalBalanceBill.toString())}
                   </Text>
                 </Box>
 

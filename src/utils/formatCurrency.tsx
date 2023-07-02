@@ -9,11 +9,4 @@ export const formatCurrency = (value: string) => {
   return formattedValue;
 };
 
-export const getNumericValue = (formattedValue: string) => {
-  const numericValue = parseFloat(
-    formattedValue?.replace(/[^0-9,-]+/g, "").replace(",", ".")
-  );
-  return numericValue;
-};
-
 
