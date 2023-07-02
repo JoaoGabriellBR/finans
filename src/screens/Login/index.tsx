@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import Header from "../../components/Header";
 import { Container, Section, Form } from "./styles";
@@ -50,12 +51,12 @@ export default function Login() {
       setLoadingLogin(false);
       const { token } = response.data;
       Cookies.set("finans-authtoken", token);
-      navigate("/dashboard")
+      navigate("/dashboard");
     } catch (error: any) {
       setLoadingLogin(false);
       console.log(error.message);
       const errorMessage = error?.response?.data?.error;
-      notification(toast, errorMessage, 'error');
+      notification(toast, errorMessage, "error");
     }
   };
 
@@ -121,7 +122,12 @@ export default function Login() {
             </Button>
 
             <Text fontSize="0.8rem">Não tem uma conta?</Text>
-            <Text as='b' cursor="pointer" onClick={() => navigate("/register")} fontSize="0.8rem">
+            <Text
+              as="b"
+              cursor="pointer"
+              onClick={() => navigate("/register")}
+              fontSize="0.8rem"
+            >
               Cadastre-se aqui
             </Text>
           </Form>

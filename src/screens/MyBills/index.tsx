@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, ChangeEvent } from "react";
 import SideMenu from "../../components/SideMenu";
 import {
@@ -170,7 +172,6 @@ export default function MyBills() {
   const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
     setDescriptionNewBill(e.target.value);
   };
-
 
   const handleNewBill = async () => {
     setLoadingNewBill(true);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { Container, Header, Section } from "./styles";
 import logo from "../../assets/logo.png";

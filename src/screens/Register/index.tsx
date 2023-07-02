@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import Header from "../../components/Header";
 import { Container, Section, Form } from "./styles";
@@ -154,7 +155,12 @@ export default function Register() {
             </Button>
 
             <Text fontSize="0.8rem">Já tem uma conta?</Text>
-            <Text as='b' cursor="pointer" onClick={() => navigate("/login")} fontSize="0.8rem">
+            <Text
+              as="b"
+              cursor="pointer"
+              onClick={() => navigate("/login")}
+              fontSize="0.8rem"
+            >
               Faça login aqui
             </Text>
           </Form>

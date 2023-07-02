@@ -8,7 +8,6 @@ interface MoneyInputProps {
 }
 
 const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange, color }) => {
-
   const formatCurrency = (value: string) => {
     const number = Number(value) / 100;
     const formattedValue = number.toLocaleString("pt-BR", {
@@ -45,5 +44,3 @@ const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange, color }) => {
 };
 
 export default MoneyInput;
-
-

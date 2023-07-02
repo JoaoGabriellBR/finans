@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, ChangeEvent } from "react";
 import {
   Container,
@@ -77,7 +79,7 @@ interface BillData {
 interface ExpenseData {
   id?: number | undefined;
   description?: string | undefined;
-  balance?: number | undefined;
+  balance?: string | undefined;
   status?: boolean | undefined;
   created_at?: number | undefined;
 }
@@ -85,7 +87,7 @@ interface ExpenseData {
 interface RevenueData {
   id?: number | undefined;
   description?: string | undefined;
-  balance?: number | undefined;
+  balance?: string | undefined;
   status?: boolean | undefined;
   created_at?: number | undefined;
 }
@@ -157,9 +159,6 @@ export default function Dashboard() {
   const [totalBalanceBill, setTotalBalanceBill] = useState<number>(0);
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
   const [totalBalanceRevenue, setTotalBalanceRevenue] = useState<number>(0);
-
-  // MOSTRAR EM SALDO ATUAL O TOTAL DE DINHEIRO QUE A PESSOA POSSUI MENOS AS
-  // DESPESAS E MAIS AS RECEITAS
 
   const loadExpenseData = async () => {
     try {
@@ -238,7 +237,7 @@ export default function Dashboard() {
 
     expenseData.forEach((expense) => {
       if (expense.balance !== undefined) {
-        totalBalanceExpense += expense.balance;
+        totalBalanceExpense += Number(expense.balance);
         if (expense.status === true) {
           totalBalanceBill -= Number(expense.balance);
         }
@@ -247,7 +246,7 @@ export default function Dashboard() {
 
     revenueData.forEach((revenue) => {
       if (revenue.balance !== undefined) {
-        totalBalanceRevenue += revenue.balance;
+        totalBalanceRevenue += Number(revenue.balance);
         if (revenue.status === true) {
           totalBalanceBill += Number(revenue.balance);
         }
@@ -1237,7 +1236,7 @@ export default function Dashboard() {
                 </Thead>
 
                 {expenseData.length !== 0 ? (
-                  expenseData.map((expense: ExpenseData) => {
+                  expenseData.map((expense: UpdateExpenseData) => {
                     return (
                       <Tbody key={expense.id}>
                         <Tr>
@@ -1362,7 +1361,7 @@ export default function Dashboard() {
                 </Thead>
 
                 {revenueData.length !== 0 ? (
-                  revenueData.map((revenue: RevenueData) => {
+                  revenueData.map((revenue: UpdateRevenueData) => {
                     return (
                       <Tbody key={revenue.id}>
                         <Tr>
