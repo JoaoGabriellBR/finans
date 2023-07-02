@@ -158,7 +158,6 @@ export default function Dashboard() {
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
   const [totalBalanceRevenue, setTotalBalanceRevenue] = useState<number>(0);
 
-
   // MOSTRAR EM SALDO ATUAL O TOTAL DE DINHEIRO QUE A PESSOA POSSUI MENOS AS
   // DESPESAS E MAIS AS RECEITAS
 
@@ -226,61 +225,43 @@ export default function Dashboard() {
     loadBillData();
   }, []);
 
-  const calculateTotalBalanceBill = () => {
-    const sum = billData.reduce((accumulator, bill) => {
+  const calculateTotalBalances = () => {
+    let totalBalanceBill = 0;
+    let totalBalanceExpense = 0;
+    let totalBalanceRevenue = 0;
+
+    billData.forEach((bill) => {
       if (bill.balance !== undefined) {
-        return accumulator + bill.balance;
-      } else {
-        return accumulator;
+        totalBalanceBill += bill.balance;
       }
-    }, 0);
+    });
 
-    setTotalBalanceBill(sum);
-  };
-
-  const calculateTotalBalanceExpense = () => {
-    const sum = expenseData.reduce((accumulator, expense) => {
+    expenseData.forEach((expense) => {
       if (expense.balance !== undefined) {
+        totalBalanceExpense += expense.balance;
         if (expense.status === true) {
-          setTotalBalanceBill(
-            (prevTotal) => prevTotal - Number(expense?.balance)
-          );
+          totalBalanceBill -= Number(expense.balance);
         }
-        return accumulator + expense.balance;
-      } else {
-        return accumulator;
       }
-    }, 0);
-    setTotalBalanceExpense(sum);
-  };
+    });
 
-  const calculateTotalBalanceRevenue = () => {
-    const sum = revenueData.reduce((accumulator, revenue) => {
+    revenueData.forEach((revenue) => {
       if (revenue.balance !== undefined) {
+        totalBalanceRevenue += revenue.balance;
         if (revenue.status === true) {
-          setTotalBalanceBill(
-            (prevTotal) => prevTotal + Number(revenue.balance)
-          );
+          totalBalanceBill += Number(revenue.balance);
         }
-        return accumulator + revenue.balance;
-      } else {
-        return accumulator;
       }
-    }, 0);
-    setTotalBalanceRevenue(sum);
+    });
+
+    setTotalBalanceBill(totalBalanceBill);
+    setTotalBalanceExpense(totalBalanceExpense);
+    setTotalBalanceRevenue(totalBalanceRevenue);
   };
 
   useEffect(() => {
-    calculateTotalBalanceBill();
-  }, [billData]);
-
-  useEffect(() => {
-    calculateTotalBalanceExpense();
-  }, [expenseData]);
-
-  useEffect(() => {
-    calculateTotalBalanceRevenue();
-  }, [revenueData]);
+    calculateTotalBalances();
+  }, [billData, expenseData, revenueData]);
 
   const handleChangeBalanceNewExpense = (value: string) => {
     const rawValue = value.replace(/[^\d]/g, "");
@@ -406,7 +387,7 @@ export default function Dashboard() {
       setLoadingEditExpense(false);
       setOpenEditExpense(false);
       loadExpenseData();
-      calculateTotalBalanceBill();
+      // calculateTotalBalanceBill();
 
       const successMessage = "Despesa atualizada com sucesso.";
       notification(toast, successMessage, "success");
@@ -433,7 +414,7 @@ export default function Dashboard() {
       setLoadingDeleteExpense(false);
       setOpenDeleteExpense(false);
       loadExpenseData();
-      calculateTotalBalanceBill();
+      // calculateTotalBalanceBill();
       const successMessage = "Despesa excluída com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -494,7 +475,7 @@ export default function Dashboard() {
       setLoadingReceiveRevenue(false);
       setOpenReceiveRevenue(false);
       loadRevenueData();
-      calculateTotalBalanceBill();
+      // calculateTotalBalanceBill();
       const successMessage = "Receita recebida com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -529,7 +510,7 @@ export default function Dashboard() {
       setLoadingEditRevenue(false);
       setOpenEditRevenue(false);
       loadRevenueData();
-      calculateTotalBalanceBill();
+      // calculateTotalBalanceBill();
       const successMessage = "Receita atualizada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -555,7 +536,7 @@ export default function Dashboard() {
       setLoadingDeleteRevenue(false);
       setOpenDeleteRevenue(false);
       loadRevenueData();
-      calculateTotalBalanceBill();
+      // calculateTotalBalanceBill();
       const successMessage = "Receita excluída com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
