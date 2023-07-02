@@ -158,6 +158,10 @@ export default function Dashboard() {
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
   const [totalBalanceRevenue, setTotalBalanceRevenue] = useState<number>(0);
 
+
+  // MOSTRAR EM SALDO ATUAL O TOTAL DE DINHEIRO QUE A PESSOA POSSUI MENOS AS
+  // DESPESAS E MAIS AS RECEITAS
+
   const loadExpenseData = async () => {
     try {
       const response = await api({
@@ -238,7 +242,9 @@ export default function Dashboard() {
     const sum = expenseData.reduce((accumulator, expense) => {
       if (expense.balance !== undefined) {
         if (expense.status === true) {
-          setTotalBalanceBill((prevTotal) => prevTotal - expense?.balance);
+          setTotalBalanceBill(
+            (prevTotal) => prevTotal - Number(expense?.balance)
+          );
         }
         return accumulator + expense.balance;
       } else {
@@ -252,7 +258,9 @@ export default function Dashboard() {
     const sum = revenueData.reduce((accumulator, revenue) => {
       if (revenue.balance !== undefined) {
         if (revenue.status === true) {
-          setTotalBalanceBill((prevTotal) => prevTotal + revenue.balance);
+          setTotalBalanceBill(
+            (prevTotal) => prevTotal + Number(revenue.balance)
+          );
         }
         return accumulator + revenue.balance;
       } else {
@@ -578,8 +586,8 @@ export default function Dashboard() {
               mb="1.5rem"
               variant="flushed"
               type="text"
-              placeholder="Descrição"
-              maxLength={500}
+              placeholder="Descrição (max 50 caracteres)"
+              maxLength={50}
               value={descriptionNewExpense}
               onChange={handleChangeDescriptionNewExpense}
             />
@@ -591,11 +599,16 @@ export default function Dashboard() {
               value={selectedBillExpense}
               onChange={(e) => setSelectedBillExpense(e.target.value)}
             >
-              {billData.map((bill: BillData) => (
-                <option key={bill.id} value={bill.id}>
-                  {bill.description}
-                </option>
-              ))}
+              {billData?.length >= 1 &&
+                billData.map((bill: BillData) => (
+                  <option key={bill.id} value={bill.id}>
+                    {bill.description}
+                  </option>
+                ))}
+
+              {!billData?.length && (
+                <option disabled>Nenhuma conta encontrada</option>
+              )}
             </Select>
 
             <DivSwitch>
@@ -701,8 +714,8 @@ export default function Dashboard() {
               mt="1.5rem"
               variant="flushed"
               type="text"
-              placeholder="Descrição"
-              maxLength={500}
+              placeholder="Descrição (max 50 caracteres)"
+              maxLength={50}
               value={updateExpenseData?.description}
               onChange={(e) =>
                 setUpdateExpenseData({
@@ -815,8 +828,8 @@ export default function Dashboard() {
               mb="1.5rem"
               variant="flushed"
               type="text"
-              placeholder="Descrição"
-              maxLength={500}
+              placeholder="Descrição (max 50 caracteres)"
+              maxLength={50}
               value={descriptionNewRevenue}
               onChange={handleChangeDescriptionNewRevenue}
             />
@@ -828,11 +841,16 @@ export default function Dashboard() {
               value={selectedBillRevenue}
               onChange={(e) => setSelectedBillRevenue(e.target.value)}
             >
-              {billData.map((bill: BillData) => (
-                <option key={bill.id} value={bill.id}>
-                  {bill.description}
-                </option>
-              ))}
+              {billData?.length >= 1 &&
+                billData.map((bill: BillData) => (
+                  <option key={bill.id} value={bill.id}>
+                    {bill.description}
+                  </option>
+                ))}
+
+              {!billData?.length && (
+                <option disabled>Nenhuma conta encontrada</option>
+              )}
             </Select>
 
             <DivSwitch>
@@ -944,8 +962,8 @@ export default function Dashboard() {
               mt="1.5rem"
               variant="flushed"
               type="text"
-              placeholder="Descrição"
-              maxLength={500}
+              placeholder="Descrição (max 50 caracteres)"
+              maxLength={50}
               value={updateRevenueData?.description}
               onChange={(e) =>
                 setUpdateRevenueData({
@@ -1252,9 +1270,13 @@ export default function Dashboard() {
                           <Td isNumeric>
                             {moment(expense.created_at).format("DD/MM/YYYY")}
                           </Td>
-                          <Td>{expense.description}</Td>
+                          {Number(expense?.description?.length) >= 20 ? (
+                            <Td>{expense.description?.slice(0, 20)}...</Td>
+                          ) : (
+                            <Td>{expense.description}</Td>
+                          )}
                           <Td color="#f00">
-                            {formatCurrency(expense?.balance?.toString())}
+                            {formatCurrency(String(expense?.balance))}
                           </Td>
                           <Td>
                             <DivAcoes>
@@ -1373,9 +1395,13 @@ export default function Dashboard() {
                           <Td isNumeric>
                             {moment(revenue.created_at).format("DD/MM/YYYY")}
                           </Td>
-                          <Td>{revenue.description}</Td>
+                          {Number(revenue?.description?.length) >= 20 ? (
+                            <Td>{revenue.description?.slice(0, 20)}...</Td>
+                          ) : (
+                            <Td>{revenue.description}</Td>
+                          )}
                           <Td color="green">
-                            {formatCurrency(revenue?.balance?.toString())}
+                            {formatCurrency(String(revenue?.balance))}
                           </Td>
                           <Td>
                             <DivAcoes>

@@ -235,7 +235,7 @@ export default function MyBills() {
               variant="flushed"
               type="text"
               placeholder="Descrição (max 50 caracteres)"
-              maxLength={500}
+              maxLength={50}
               value={descriptionNewBill}
               onChange={handleChangeDescriptionNewBill}
             />
@@ -274,7 +274,7 @@ export default function MyBills() {
               variant="flushed"
               type="text"
               placeholder="Descrição (max 50 caracteres)"
-              maxLength={500}
+              maxLength={50}
               value={updateBillData?.description}
               onChange={(e) => {
                 setUpdateBillData((prevBillData) => ({
@@ -325,7 +325,7 @@ export default function MyBills() {
       </Modal>
     );
   };
-
+  
   return (
     <>
       {renderNewBill()}
@@ -381,7 +381,7 @@ export default function MyBills() {
               <Text fontSize="1.5rem">Nova conta</Text>
             </CardNovaConta>
 
-            {billData?.map((bill: any, index: number) => (
+            {billData?.map((bill: any) => (
               <CardContas>
                 <Box className="div-nome-conta" mb="2rem">
                   <div className="div-carteira">
