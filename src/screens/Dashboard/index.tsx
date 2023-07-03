@@ -1134,9 +1134,16 @@ export default function Dashboard() {
                   <Text fontSize="0.9rem" color="gray">
                     Saldo atual
                   </Text>
-                  <Text fontSize="1.5rem">
-                    {formatCurrency(totalBalanceBill.toString())}
-                  </Text>
+
+                  {totalBalanceBill < totalBalanceExpense ? (
+                    <Text fontSize="1.5rem" color="red.400">
+                      {"-" + formatCurrency(totalBalanceBill.toString())}
+                    </Text>
+                  ) : (
+                    <Text fontSize="1.5rem">
+                      {formatCurrency(totalBalanceBill.toString())}
+                    </Text>
+                  )}
                 </CardLeft>
 
                 <CardRight>
@@ -1261,7 +1268,9 @@ export default function Dashboard() {
                           <Td>
                             <DivAcoes>
                               <Tooltip
-                                label="Pagar despesa"
+                                label={
+                                  expense.status ? "Paga" : "Pagar despesa"
+                                }
                                 aria-label="A tooltip"
                               >
                                 <IconButton
@@ -1386,7 +1395,11 @@ export default function Dashboard() {
                           <Td>
                             <DivAcoes>
                               <Tooltip
-                                label="Receber receita"
+                                label={
+                                  revenue.status
+                                    ? "Recebida"
+                                    : "Receber receita"
+                                }
                                 aria-label="A tooltip"
                               >
                                 <IconButton
