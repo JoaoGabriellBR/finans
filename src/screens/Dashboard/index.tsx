@@ -1037,6 +1037,132 @@ export default function Dashboard() {
     );
   };
 
+  const ExpenseRow = ({ expense }: { expense: UpdateExpenseData }) => {
+    const isPending = !expense.status;
+
+    const handlePayExpense = () => {
+      setOpenPayExpense(true);
+      setUpdateExpenseData(expense);
+    };
+
+    const handleEditExpense = () => {
+      setOpenEditExpense(true);
+      setUpdateExpenseData(expense);
+    };
+
+    const handleDeleteExpense = () => {
+      setOpenDeleteExpense(true);
+      setUpdateExpenseData(expense);
+    };
+
+    return (
+      <Tr>
+        <Td>
+          <Text color={isPending ? "red" : "green"}>
+            {isPending ? "Pendente" : "Recebida"}
+          </Text>
+        </Td>
+        <Td isNumeric>{moment(expense.created_at).format("DD/MM/YYYY")}</Td>
+        <Td>{expense.description?.slice(0, 20) || expense.description}</Td>
+        <Td color="green">{formatCurrency(String(expense.balance))}</Td>
+        <Td>
+          <DivAcoes>
+            <Tooltip
+              label={isPending ? "Pagar despesa" : "Paga"}
+              aria-label="A tooltip"
+            >
+              <IconButton
+                aria-label="Icon Button"
+                onClick={handlePayExpense}
+                isDisabled={!isPending}
+              >
+                <FiCheckCircle cursor="pointer" aria-label="Pay expense" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip label="Editar despesa" aria-label="A tooltip">
+              <IconButton aria-label="Icon Button" onClick={handleEditExpense}>
+                <FiEdit cursor="pointer" aria-label="Edit expense" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip label="Excluir despesa" aria-label="A tooltip">
+              <IconButton
+                aria-label="Icon Button"
+                onClick={handleDeleteExpense}
+              >
+                <AiOutlineDelete cursor="pointer" aria-label="Delete expense" />
+              </IconButton>
+            </Tooltip>
+          </DivAcoes>
+        </Td>
+      </Tr>
+    );
+  }
+
+  const RevenueRow = ({ revenue }: { revenue: UpdateRevenueData }) => {
+    const isPending = !revenue.status;
+
+    const handleReceiveRevenue = () => {
+      setOpenReceiveRevenue(true);
+      setUpdateRevenueData(revenue);
+    };
+
+    const handleEditRevenue = () => {
+      setOpenEditRevenue(true);
+      setUpdateRevenueData(revenue);
+    };
+
+    const handleDeleteRevenue = () => {
+      setOpenDeleteRevenue(true);
+      setUpdateRevenueData(revenue);
+    };
+
+    return (
+      <Tr>
+        <Td>
+          <Text color={isPending ? "red" : "green"}>
+            {isPending ? "Pendente" : "Recebida"}
+          </Text>
+        </Td>
+        <Td isNumeric>{moment(revenue.created_at).format("DD/MM/YYYY")}</Td>
+        <Td>{revenue.description?.slice(0, 20) || revenue.description}</Td>
+        <Td color="green">{formatCurrency(String(revenue.balance))}</Td>
+        <Td>
+          <DivAcoes>
+            <Tooltip
+              label={isPending ? "Receber receita" : "Recebida"}
+              aria-label="A tooltip"
+            >
+              <IconButton
+                aria-label="Icon Button"
+                onClick={handleReceiveRevenue}
+                isDisabled={!isPending}
+              >
+                <FiCheckCircle cursor="pointer" aria-label="Receive revenue" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip label="Editar receita" aria-label="A tooltip">
+              <IconButton aria-label="Icon Button" onClick={handleEditRevenue}>
+                <FiEdit cursor="pointer" aria-label="Edit revenue" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip label="Excluir receita" aria-label="A tooltip">
+              <IconButton
+                aria-label="Icon Button"
+                onClick={handleDeleteRevenue}
+              >
+                <AiOutlineDelete cursor="pointer" aria-label="Delete revenue" />
+              </IconButton>
+            </Tooltip>
+          </DivAcoes>
+        </Td>
+      </Tr>
+    );
+  };
+  
   return (
     <>
       {renderNewExpense()}
@@ -1243,92 +1369,9 @@ export default function Dashboard() {
                 </Thead>
 
                 {expenseData.length !== 0 ? (
-                  expenseData.map((expense: UpdateExpenseData) => {
-                    return (
-                      <Tbody key={expense.id}>
-                        <Tr>
-                          <Td>
-                            {expense.status === false ? (
-                              <Text color="red">Pendente</Text>
-                            ) : (
-                              <Text color="green">Paga</Text>
-                            )}
-                          </Td>
-                          <Td isNumeric>
-                            {moment(expense.created_at).format("DD/MM/YYYY")}
-                          </Td>
-                          {Number(expense?.description?.length) >= 20 ? (
-                            <Td>{expense.description?.slice(0, 20)}...</Td>
-                          ) : (
-                            <Td>{expense.description}</Td>
-                          )}
-                          <Td color="#f00">
-                            {formatCurrency(String(expense?.balance))}
-                          </Td>
-                          <Td>
-                            <DivAcoes>
-                              <Tooltip
-                                label={
-                                  expense.status ? "Paga" : "Pagar despesa"
-                                }
-                                aria-label="A tooltip"
-                              >
-                                <IconButton
-                                  aria-label="Icon Button"
-                                  onClick={() => {
-                                    setOpenPayExpense(true);
-                                    setUpdateExpenseData(expense);
-                                  }}
-                                  isDisabled={expense.status !== false}
-                                >
-                                  <FiCheckCircle
-                                    cursor="pointer"
-                                    aria-label="Pay expense"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-
-                              <Tooltip
-                                label="Editar despesa"
-                                aria-label="A tooltip"
-                              >
-                                <IconButton
-                                  aria-label="Icon Button"
-                                  onClick={() => {
-                                    setOpenEditExpense(true);
-                                    setUpdateExpenseData(expense);
-                                  }}
-                                >
-                                  <FiEdit
-                                    cursor="pointer"
-                                    aria-label="Edit expense"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-
-                              <Tooltip
-                                label="Excluir despesa"
-                                aria-label="A tooltip"
-                              >
-                                <IconButton
-                                  aria-label="Icon Button"
-                                  onClick={() => {
-                                    setOpenDeleteExpense(true);
-                                    setUpdateExpenseData(expense);
-                                  }}
-                                >
-                                  <AiOutlineDelete
-                                    cursor="pointer"
-                                    aria-label="Delete expense"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </DivAcoes>
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    );
-                  })
+                  expenseData.map((expense) => (
+                    <ExpenseRow key={expense.id} expense={expense} />
+                  ))
                 ) : (
                   <Text p="6">Você não possui despesas cadastradas.</Text>
                 )}
@@ -1361,106 +1404,23 @@ export default function Dashboard() {
                     <Th width="20%" isNumeric>
                       Data
                     </Th>
+                    <Th width="20%">Conta</Th>
                     <Th width="30%">Descrição</Th>
-                    <Th width="5%" isNumeric>
+                    <Th width="35%" isNumeric>
                       Valor
                     </Th>
                     <Th width="15%">Ações</Th>
                   </Tr>
                 </Thead>
-
-                {revenueData.length !== 0 ? (
-                  revenueData.map((revenue: UpdateRevenueData) => {
-                    return (
-                      <Tbody key={revenue.id}>
-                        <Tr>
-                          <Td>
-                            {revenue.status === false ? (
-                              <Text color="red">Pendente</Text>
-                            ) : (
-                              <Text color="green">Recebida</Text>
-                            )}
-                          </Td>
-                          <Td isNumeric>
-                            {moment(revenue.created_at).format("DD/MM/YYYY")}
-                          </Td>
-                          {Number(revenue?.description?.length) >= 20 ? (
-                            <Td>{revenue.description?.slice(0, 20)}...</Td>
-                          ) : (
-                            <Td>{revenue.description}</Td>
-                          )}
-                          <Td color="green">
-                            {formatCurrency(String(revenue?.balance))}
-                          </Td>
-                          <Td>
-                            <DivAcoes>
-                              <Tooltip
-                                label={
-                                  revenue.status
-                                    ? "Recebida"
-                                    : "Receber receita"
-                                }
-                                aria-label="A tooltip"
-                              >
-                                <IconButton
-                                  aria-label="Icon Button"
-                                  onClick={() => {
-                                    setOpenReceiveRevenue(true);
-                                    setUpdateRevenueData(revenue);
-                                  }}
-                                  isDisabled={revenue.status !== false}
-                                >
-                                  <FiCheckCircle
-                                    cursor="pointer"
-                                    aria-label="Receive revenue"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-
-                              <Tooltip
-                                label="Editar receita"
-                                aria-label="A tooltip"
-                              >
-                                <IconButton
-                                  aria-label="Icon Button"
-                                  onClick={() => {
-                                    setOpenEditRevenue(true);
-                                    setUpdateRevenueData(revenue);
-                                  }}
-                                >
-                                  <FiEdit
-                                    cursor="pointer"
-                                    aria-label="Edit revenue"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-
-                              <Tooltip
-                                label="Excluir receita"
-                                aria-label="A tooltip"
-                              >
-                                <IconButton
-                                  aria-label="Icon Button"
-                                  onClick={() => {
-                                    setOpenDeleteRevenue(true);
-                                    setUpdateRevenueData(revenue);
-                                  }}
-                                >
-                                  <AiOutlineDelete
-                                    cursor="pointer"
-                                    aria-label="Delete revenue"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </DivAcoes>
-                          </Td>
-                        </Tr>
-                      </Tbody>
-                    );
-                  })
-                ) : (
-                  <Text p="6">Você não possui receitas cadastradas.</Text>
-                )}
+                <Tbody>
+                  {revenueData.length !== 0 ? (
+                    revenueData.map((revenue) => (
+                      <RevenueRow key={revenue.id} revenue={revenue} />
+                    ))
+                  ) : (
+                    <Text p="6">Você não possui receitas cadastradas.</Text>
+                  )}
+                </Tbody>
               </Table>
             </TableContainer>
           </DivReceitas>
