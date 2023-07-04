@@ -682,7 +682,7 @@ export default function Dashboard() {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <MoneyInput
-              value={(Number(updateExpenseData?.balance) * 100).toString()}
+              value={(Number(updateExpenseData?.balance)).toString()}
               onChange={(value) => {
                 const formattedValue = Number(value) / 100;
                 handleChangeBalanceEditExpense(formattedValue.toString());
@@ -1059,7 +1059,7 @@ export default function Dashboard() {
       <Tr>
         <Td>
           <Text color={isPending ? "red" : "green"}>
-            {isPending ? "Pendente" : "Recebida"}
+            {isPending ? "Pendente" : "Paga"}
           </Text>
         </Td>
         <Td isNumeric>{moment(expense.created_at).format("DD/MM/YYYY")}</Td>
@@ -1261,7 +1261,7 @@ export default function Dashboard() {
                     Saldo atual
                   </Text>
 
-                  {totalBalanceBill < totalBalanceExpense ? (
+                  {/* {totalBalanceBill < totalBalanceExpense ? (
                     <Text fontSize="1.5rem" color="red.400">
                       {"-" + formatCurrency(totalBalanceBill.toString())}
                     </Text>
@@ -1269,7 +1269,11 @@ export default function Dashboard() {
                     <Text fontSize="1.5rem">
                       {formatCurrency(totalBalanceBill.toString())}
                     </Text>
-                  )}
+                  )} */}
+
+                  <Text fontSize="1.5rem">
+                    {formatCurrency(totalBalanceBill.toString())}
+                  </Text>
                 </CardLeft>
 
                 <CardRight>
@@ -1404,9 +1408,8 @@ export default function Dashboard() {
                     <Th width="20%" isNumeric>
                       Data
                     </Th>
-                    <Th width="20%">Conta</Th>
                     <Th width="30%">Descrição</Th>
-                    <Th width="35%" isNumeric>
+                    <Th width="5%" isNumeric>
                       Valor
                     </Th>
                     <Th width="15%">Ações</Th>

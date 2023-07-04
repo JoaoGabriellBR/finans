@@ -304,7 +304,7 @@ export default function MyBills() {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <MoneyInput
-              value={(Number(updateBillData?.balance) * 100).toString()}
+              value={(Number(updateBillData?.balance)).toString()}
               onChange={(value) => {
                 const formattedValue = Number(value) / 100;
                 handleChangeBalanceEditBill(formattedValue.toString());
@@ -470,13 +470,7 @@ export default function MyBills() {
                   <Text fontSize="0.9rem">Saldo total</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
                     {formatCurrency(bill?.balance.toString())}
-                  </Text>
-                </Box>
-
-                <Box className="div-saldo-atual" mb="1rem">
-                  <Text fontSize="0.9rem">Saldo previsto</Text>
-                  <Text as="b" color="green" fontSize="0.9rem">
-                    {formatCurrency(totalBalanceBill.toString())}
+                    {bill?.balance}
                   </Text>
                 </Box>
 
