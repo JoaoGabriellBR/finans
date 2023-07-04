@@ -1242,17 +1242,10 @@ export default function Dashboard() {
                     Saldo atual
                   </Text>
 
-                  {/* {totalBalanceBill < totalBalanceExpense ? (
-                    <Text fontSize="1.5rem" color="red.400">
-                      {"-" + formatCurrency(totalBalanceBill.toString())}
-                    </Text>
-                  ) : (
-                    <Text fontSize="1.5rem">
-                      {formatCurrency(totalBalanceBill.toString())}
-                    </Text>
-                  )} */}
-
-                  <Text fontSize="1.5rem">
+                  <Text
+                    color={totalBalanceBill < 0 ? "red" : "green"}
+                    fontSize="1.5rem"
+                  >
                     R$ {totalBalanceBill}
                   </Text>
                 </CardLeft>

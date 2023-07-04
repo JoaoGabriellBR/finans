@@ -123,48 +123,44 @@ export default function MyBills() {
     loadData();
   }, []);
 
-  const calculateTotalBalances = () => {
-    let totalBalanceBill = 0;
+  // const calculateTotalBalances = () => {
+  //   let totalBalanceBill = 0;
 
-    billData.forEach((bill) => {
-      if (bill.balance !== undefined) {
-        totalBalanceBill += bill.balance;
+  //   billData.forEach((bill) => {
+  //     if (bill.balance !== undefined) {
+  //       totalBalanceBill += bill.balance;
 
-        if (bill.revenues) {
-          bill.revenues.forEach((revenue: any) => {
-            if (revenue.balance !== undefined && revenue.status === true) {
-              totalBalanceBill += revenue.balance;
-            }
-          });
-        }
+  //       if (bill.revenues) {
+  //         bill.revenues.forEach((revenue: any) => {
+  //           if (revenue.balance !== undefined && revenue.status === true) {
+  //             totalBalanceBill += revenue.balance;
+  //           }
+  //         });
+  //       }
 
-        if (bill.expenses) {
-          bill.expenses.forEach((expense: any) => {
-            if (expense.balance !== undefined && expense.status === true) {
-              totalBalanceBill -= expense.balance;
-            }
-          });
-        }
-      }
-    });
+  //       if (bill.expenses) {
+  //         bill.expenses.forEach((expense: any) => {
+  //           if (expense.balance !== undefined && expense.status === true) {
+  //             totalBalanceBill -= expense.balance;
+  //           }
+  //         });
+  //       }
+  //     }
+  //   });
 
-    setTotalBalanceBill(totalBalanceBill);
-  };
-
-  useEffect(() => {
-    calculateTotalBalances();
-  }, [billData]);
+  //   setTotalBalanceBill(totalBalanceBill);
+  // };
 
   const handleChangeBalanceNewBill = (value: string) => {
     const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue) / 100;
+    const floatValue = parseFloat(rawValue);
     const stringValue = floatValue.toString();
     setBalanceNewBill(stringValue);
   };
 
   const handleChangeBalanceEditBill = (value: string) => {
     const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue) / 100;
+    const floatValue = parseFloat(rawValue);
     const stringValue = floatValue.toString();
     setUpdateBillData({ ...updateBillData, balance: stringValue });
   };
@@ -469,8 +465,18 @@ export default function MyBills() {
                 <Box className="div-saldo-atual" mb="1rem">
                   <Text fontSize="0.9rem">Saldo total</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
-                    {formatCurrency(bill?.balance.toString())}
-                    {bill?.balance}
+                    R$ {bill?.balance}
+                  </Text>
+                </Box>
+
+                <Box className="div-saldo-atual" mb="1rem">
+                  <Text fontSize="0.9rem">Saldo atual</Text>
+                  <Text
+                    as="b"
+                    color={bill?.billTotal < 0 ? "red" : "green"}
+                    fontSize="0.9rem"
+                  >
+                    R$ {bill?.billTotal}
                   </Text>
                 </Box>
 
