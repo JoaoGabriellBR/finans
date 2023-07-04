@@ -160,9 +160,18 @@ export default function Dashboard() {
   const [totalBalanceExpense, setTotalBalanceExpense] = useState<number>(0);
   const [totalBalanceRevenue, setTotalBalanceRevenue] = useState<number>(0);
 
-  const loadExpenseData = async () => {
+  const loadData = async () => {
     try {
-      const response = await api({
+      const billData = await api({
+        method: "GET",
+        url: "/bill/get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: Cookies.get("finans-authtoken"),
+        },
+      });
+
+      const expenseData = await api({
         method: "GET",
         url: "/expense/get",
         headers: {
@@ -171,20 +180,7 @@ export default function Dashboard() {
         },
       });
 
-      setExpenseData(response?.data?.response);
-    } catch (e) {
-      const errorMessage = "Não foi possível carregar os dados.";
-      notification(toast, errorMessage, "error");
-    }
-  };
-
-  useEffect(() => {
-    loadExpenseData();
-  }, []);
-
-  const loadRevenueData = async () => {
-    try {
-      const response = await api({
+      const revenueData = await api({
         method: "GET",
         url: "/revenue/get",
         headers: {
@@ -192,75 +188,58 @@ export default function Dashboard() {
           Authorization: Cookies.get("finans-authtoken"),
         },
       });
-      setRevenueData(response?.data?.response);
+
+      setBillData(billData?.data?.response);
+      setExpenseData(expenseData?.data?.response);
+      setRevenueData(revenueData?.data?.response);
     } catch (e) {
       const errorMessage = "Não foi possível carregar os dados.";
       notification(toast, errorMessage, "error");
     }
   };
 
-  useEffect(() => {
-    loadRevenueData();
-  }, []);
+  const loadTotalBalance = async () => {
 
-  const loadBillData = async () => {
-    try {
-      const response = await api({
-        method: "GET",
-        url: "/bill/get",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: Cookies.get("finans-authtoken"),
-        },
-      });
-      setBillData(response?.data?.response);
-    } catch (e) {
-      const errorMessage = "Não foi possível carregar os dados.";
-      notification(toast, errorMessage, "error");
-    }
+    const totalBill = await api({
+      method: "GET",
+      url: "/total-balance-bill",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: Cookies.get("finans-authtoken"),
+      },
+    });
+
+    const totalExpense = await api({
+      method: "GET",
+      url: "/total-balance-expense",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: Cookies.get("finans-authtoken"),
+      },
+    });
+
+    const totalRevenue = await api({
+      method: "GET",
+      url: "/total-balance-revenue",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: Cookies.get("finans-authtoken"),
+      },
+    });
+
+    setTotalBalanceBill(totalBill?.data?.total_balance_bill);
+    console.log(totalBalanceBill)
+    setTotalBalanceExpense(totalExpense?.data?.total_balance_expense);
+    setTotalBalanceRevenue(totalRevenue?.data?.total_balance_revenue);
   };
 
   useEffect(() => {
-    loadBillData();
-  }, []);
-
-  const calculateTotalBalances = () => {
-    let totalBalanceBill = 0;
-    let totalBalanceExpense = 0;
-    let totalBalanceRevenue = 0;
-
-    billData.forEach((bill) => {
-      if (bill.balance !== undefined) {
-        totalBalanceBill += bill.balance;
-      }
-    });
-
-    expenseData.forEach((expense) => {
-      if (expense.balance !== undefined) {
-        totalBalanceExpense += Number(expense.balance);
-        if (expense.status === true) {
-          totalBalanceBill -= Number(expense.balance);
-        }
-      }
-    });
-
-    revenueData.forEach((revenue) => {
-      if (revenue.balance !== undefined) {
-        totalBalanceRevenue += Number(revenue.balance);
-        if (revenue.status === true) {
-          totalBalanceBill += Number(revenue.balance);
-        }
-      }
-    });
-
-    setTotalBalanceBill(totalBalanceBill);
-    setTotalBalanceExpense(totalBalanceExpense);
-    setTotalBalanceRevenue(totalBalanceRevenue);
-  };
+    loadData();
+  }, []);  
 
   useEffect(() => {
-    calculateTotalBalances();
-  }, [billData, expenseData, revenueData]);
+    loadTotalBalance();
+  }, []);
 
   const handleChangeBalanceNewExpense = (value: string) => {
     const rawValue = value.replace(/[^\d]/g, "");
@@ -327,7 +306,8 @@ export default function Dashboard() {
 
       setLoadingNewExpense(false);
       setOpenNewExpense(false);
-      loadExpenseData();
+      loadData();
+      loadTotalBalance();
       const successMessage = "Despesa criada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -350,7 +330,8 @@ export default function Dashboard() {
       });
       setLoadingPayExpense(false);
       setOpenPayExpense(false);
-      loadExpenseData();
+      loadData();
+      loadTotalBalance();
       const successMessage = "Despesa paga com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -385,9 +366,8 @@ export default function Dashboard() {
 
       setLoadingEditExpense(false);
       setOpenEditExpense(false);
-      loadExpenseData();
-      // calculateTotalBalanceBill();
-
+      loadData();
+      loadTotalBalance();
       const successMessage = "Despesa atualizada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -412,8 +392,8 @@ export default function Dashboard() {
       });
       setLoadingDeleteExpense(false);
       setOpenDeleteExpense(false);
-      loadExpenseData();
-      // calculateTotalBalanceBill();
+      loadData();
+      loadTotalBalance();
       const successMessage = "Despesa excluída com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -450,7 +430,8 @@ export default function Dashboard() {
 
       setLoadingNewRevenue(false);
       setOpenNewRevenue(false);
-      loadRevenueData();
+      loadData();
+      loadTotalBalance();
       const successMessage = "Receita criada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -473,8 +454,8 @@ export default function Dashboard() {
       });
       setLoadingReceiveRevenue(false);
       setOpenReceiveRevenue(false);
-      loadRevenueData();
-      // calculateTotalBalanceBill();
+      loadData();
+      loadTotalBalance();
       const successMessage = "Receita recebida com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -508,8 +489,8 @@ export default function Dashboard() {
       });
       setLoadingEditRevenue(false);
       setOpenEditRevenue(false);
-      loadRevenueData();
-      // calculateTotalBalanceBill();
+      loadData();
+      loadTotalBalance();
       const successMessage = "Receita atualizada com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -534,8 +515,8 @@ export default function Dashboard() {
       });
       setLoadingDeleteRevenue(false);
       setOpenDeleteRevenue(false);
-      loadRevenueData();
-      // calculateTotalBalanceBill();
+      loadData();
+      loadTotalBalance();
       const successMessage = "Receita excluída com sucesso.";
       notification(toast, successMessage, "success");
     } catch (error: any) {
@@ -1064,7 +1045,7 @@ export default function Dashboard() {
         </Td>
         <Td isNumeric>{moment(expense.created_at).format("DD/MM/YYYY")}</Td>
         <Td>{expense.description?.slice(0, 20) || expense.description}</Td>
-        <Td color="green">{formatCurrency(String(expense.balance))}</Td>
+        <Td color="green">R$ {expense.balance}</Td>
         <Td>
           <DivAcoes>
             <Tooltip
@@ -1127,7 +1108,7 @@ export default function Dashboard() {
         </Td>
         <Td isNumeric>{moment(revenue.created_at).format("DD/MM/YYYY")}</Td>
         <Td>{revenue.description?.slice(0, 20) || revenue.description}</Td>
-        <Td color="green">{formatCurrency(String(revenue.balance))}</Td>
+        <Td color="green">R$ {revenue.balance}</Td>
         <Td>
           <DivAcoes>
             <Tooltip
@@ -1272,7 +1253,7 @@ export default function Dashboard() {
                   )} */}
 
                   <Text fontSize="1.5rem">
-                    {formatCurrency(totalBalanceBill.toString())}
+                    R$ {totalBalanceBill}
                   </Text>
                 </CardLeft>
 
@@ -1298,7 +1279,8 @@ export default function Dashboard() {
                   </Text>
                   <Text fontSize="1.5rem">
                     {" "}
-                    {formatCurrency(totalBalanceRevenue.toString())}
+                    {/* {formatCurrency(totalBalanceRevenue.toString())} */}
+                    R$ {totalBalanceRevenue}
                   </Text>
                 </CardLeft>
 
@@ -1323,7 +1305,8 @@ export default function Dashboard() {
                     Despesas
                   </Text>
                   <Text fontSize="1.5rem">
-                    {formatCurrency(totalBalanceExpense.toString())}
+                    {/* {formatCurrency(totalBalanceExpense.toString())} */}
+                    R$ {totalBalanceExpense}
                   </Text>
                 </CardLeft>
 
