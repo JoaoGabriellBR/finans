@@ -67,7 +67,6 @@ import notification from "../../utils/toast";
 import api from "../../api";
 import Cookies from "js-cookie";
 import moment from "moment";
-import { formatCurrency } from "../../utils/formatCurrency";
 import MoneyInput from "../../components/MoneyInput";
 
 interface BillData {
@@ -117,13 +116,16 @@ export default function Dashboard() {
   const [loadingNewRevenue, setLoadingNewRevenue] = useState<boolean>(false);
 
   const [loadingPayExpense, setLoadingPayExpense] = useState<boolean>(false);
-  const [loadingReceiveRevenue, setLoadingReceiveRevenue] = useState<boolean>(false);
+  const [loadingReceiveRevenue, setLoadingReceiveRevenue] =
+    useState<boolean>(false);
 
   const [loadingEditExpense, setLoadingEditExpense] = useState<boolean>(false);
   const [loadingEditRevenue, setLoadingEditRevenue] = useState<boolean>(false);
 
-  const [loadingDeleteExpense, setLoadingDeleteExpense] = useState<boolean>(false);
-  const [loadingDeleteRevenue, setLoadingDeleteRevenue] = useState<boolean>(false);
+  const [loadingDeleteExpense, setLoadingDeleteExpense] =
+    useState<boolean>(false);
+  const [loadingDeleteRevenue, setLoadingDeleteRevenue] =
+    useState<boolean>(false);
 
   const [billData, setBillData] = useState<BillData[]>([]);
   const [expenseData, setExpenseData] = useState<ExpenseData[]>([]);
@@ -150,8 +152,10 @@ export default function Dashboard() {
   const [balanceNewExpense, setBalanceNewExpense] = useState<string>("");
   const [balanceNewRevenue, setBalanceNewRevenue] = useState<string>("");
 
-  const [descriptionNewExpense, setDescriptionNewExpense] = useState<string>("");
-  const [descriptionNewRevenue, setDescriptionNewRevenue] = useState<string>("");
+  const [descriptionNewExpense, setDescriptionNewExpense] =
+    useState<string>("");
+  const [descriptionNewRevenue, setDescriptionNewRevenue] =
+    useState<string>("");
 
   const [statusNewExpense, setStatusNewExpense] = useState<boolean>(Boolean);
   const [statusNewRevenue, setStatusNewRevenue] = useState<boolean>(Boolean);
@@ -199,7 +203,6 @@ export default function Dashboard() {
   };
 
   const loadTotalBalance = async () => {
-
     const totalBill = await api({
       method: "GET",
       url: "/total-balance-bill",
@@ -228,45 +231,33 @@ export default function Dashboard() {
     });
 
     setTotalBalanceBill(totalBill?.data?.total_balance_bill);
-    console.log(totalBalanceBill)
+    console.log(totalBalanceBill);
     setTotalBalanceExpense(totalExpense?.data?.total_balance_expense);
     setTotalBalanceRevenue(totalRevenue?.data?.total_balance_revenue);
   };
 
   useEffect(() => {
     loadData();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     loadTotalBalance();
   }, []);
 
-  const handleChangeBalanceNewExpense = (value: string) => {
-    const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue) / 100;
-    const stringValue = floatValue.toString();
-    setBalanceNewExpense(stringValue);
+  const handleChangeBalanceNewExpense = (value: any) => {
+    setBalanceNewExpense(value);
   };
 
-  const handleChangeBalanceNewRevenue = (value: string) => {
-    const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue) / 100;
-    const stringValue = floatValue.toString();
-    setBalanceNewRevenue(stringValue);
+  const handleChangeBalanceNewRevenue = (value: any) => {
+    setBalanceNewRevenue(value);
   };
 
-  const handleChangeBalanceEditExpense = (value: string) => {
-    const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue) / 100;
-    const stringValue = floatValue.toString();
-    setUpdateExpenseData({ ...updateExpenseData, balance: stringValue });
+  const handleChangeBalanceEditExpense = (value: any) => {
+    setUpdateExpenseData({ ...updateExpenseData, balance: value });
   };
 
-  const handleChangeBalanceEditRevenue = (value: string) => {
-    const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue) / 100;
-    const stringValue = floatValue.toString();
-    setUpdateRevenueData({ ...updateRevenueData, balance: stringValue });
+  const handleChangeBalanceEditRevenue = (value: any) => {
+    setUpdateRevenueData({ ...updateRevenueData, balance: value });
   };
 
   const handleChangeDescriptionNewExpense = (
@@ -346,9 +337,6 @@ export default function Dashboard() {
   const handleEditExpense = async () => {
     setLoadingEditExpense(true);
     try {
-      const formattedExpense = (
-        Number(updateExpenseData?.balance) * 100
-      ).toString();
       await api({
         method: "PATCH",
         url: `/expense/update/${updateExpenseData?.id}`,
@@ -358,7 +346,7 @@ export default function Dashboard() {
         },
         data: {
           ...updateExpenseData,
-          balance: parseFloat(formattedExpense),
+          balance: parseFloat(updateExpenseData?.balance ?? ""),
           description: updateExpenseData?.description,
           status: updateExpenseData?.status,
         },
@@ -471,9 +459,6 @@ export default function Dashboard() {
   const handleEditRevenue = async () => {
     setLoadingEditRevenue(true);
     try {
-      const formattedRevenue = (
-        Number(updateRevenueData?.balance) * 100
-      ).toString();
       await api({
         method: "PATCH",
         url: `/revenue/update/${updateRevenueData?.id}`,
@@ -482,7 +467,7 @@ export default function Dashboard() {
           Authorization: Cookies.get("finans-authtoken"),
         },
         data: {
-          balance: parseFloat(formattedRevenue),
+          balance: parseFloat(updateRevenueData?.balance ?? ""),
           description: updateRevenueData?.description,
           status: updateRevenueData?.status,
         },
@@ -536,11 +521,12 @@ export default function Dashboard() {
           <ModalHeader>Nova Despesa</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <MoneyInput
+            <MoneyInput
               value={balanceNewExpense}
               onChange={handleChangeBalanceNewExpense}
+              price
               color="red"
-            /> */}
+            />
 
             <Input
               mt="1.5rem"
@@ -637,7 +623,7 @@ export default function Dashboard() {
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ {updateExpenseData?.balance}
+                  R$ {Number(updateExpenseData?.balance).toFixed(2)}
                 </Text>
               </Box>
             </DivPayExpense>
@@ -662,14 +648,12 @@ export default function Dashboard() {
           <ModalHeader>Editar Despesa</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <MoneyInput
-              value={(Number(updateExpenseData?.balance)).toString()}
-              onChange={(value) => {
-                const formattedValue = Number(value) / 100;
-                handleChangeBalanceEditExpense(formattedValue.toString());
-              }}
+            <MoneyInput
+              value={updateExpenseData?.balance}
+              onChange={handleChangeBalanceEditExpense}
+              price={updateExpenseData?.balance}
               color="red"
-            /> */}
+            />
 
             <Input
               mt="1.5rem"
@@ -778,11 +762,12 @@ export default function Dashboard() {
           <ModalHeader>Nova Receita</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <MoneyInput
+            <MoneyInput
               value={balanceNewRevenue}
               onChange={handleChangeBalanceNewRevenue}
+              price
               color="green"
-            /> */}
+            />
 
             <Input
               mt="1.5rem"
@@ -883,7 +868,7 @@ export default function Dashboard() {
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ {updateRevenueData?.balance}
+                  R$ {Number(updateRevenueData?.balance).toFixed(2)}
                 </Text>
               </Box>
             </DivPayExpense>
@@ -910,14 +895,12 @@ export default function Dashboard() {
           <ModalHeader>Editar Receita</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <MoneyInput
-              value={(Number(updateRevenueData?.balance) * 100).toString()}
-              onChange={(value) => {
-                const formattedValue = Number(value) / 100;
-                handleChangeBalanceEditRevenue(formattedValue.toString());
-              }}
+            <MoneyInput
+              value={updateRevenueData?.balance}
+              onChange={handleChangeBalanceEditRevenue}
+              price={updateRevenueData?.balance}
               color="green"
-            /> */}
+            />
 
             <Input
               mt="1.5rem"
@@ -1045,7 +1028,7 @@ export default function Dashboard() {
         </Td>
         <Td isNumeric>{moment(expense.created_at).format("DD/MM/YYYY")}</Td>
         <Td>{expense.description?.slice(0, 20) || expense.description}</Td>
-        <Td color="green">R$ {expense.balance}</Td>
+        <Td color="red">R$ {Number(expense?.balance).toFixed(2)}</Td>
         <Td>
           <DivAcoes>
             <Tooltip
@@ -1079,7 +1062,7 @@ export default function Dashboard() {
         </Td>
       </Tr>
     );
-  }
+  };
 
   const RevenueRow = ({ revenue }: { revenue: UpdateRevenueData }) => {
     const isPending = !revenue.status;
@@ -1108,7 +1091,7 @@ export default function Dashboard() {
         </Td>
         <Td isNumeric>{moment(revenue.created_at).format("DD/MM/YYYY")}</Td>
         <Td>{revenue.description?.slice(0, 20) || revenue.description}</Td>
-        <Td color="green">R$ {revenue.balance}</Td>
+        <Td color="green">R$ {Number(revenue?.balance).toFixed(2)}</Td>
         <Td>
           <DivAcoes>
             <Tooltip
@@ -1143,7 +1126,7 @@ export default function Dashboard() {
       </Tr>
     );
   };
-  
+
   return (
     <>
       {renderNewExpense()}
@@ -1243,10 +1226,10 @@ export default function Dashboard() {
                   </Text>
 
                   <Text
-                    color={totalBalanceBill < 0 ? "red" : "green"}
+                    color={totalBalanceBill < 0 ? "red" : "black"}
                     fontSize="1.5rem"
                   >
-                    R$ {totalBalanceBill}
+                    R$ {totalBalanceBill.toFixed(2)}
                   </Text>
                 </CardLeft>
 
@@ -1271,9 +1254,7 @@ export default function Dashboard() {
                     Receitas
                   </Text>
                   <Text fontSize="1.5rem">
-                    {" "}
-                    {/* {formatCurrency(totalBalanceRevenue.toString())} */}
-                    R$ {totalBalanceRevenue}
+                    R$ {totalBalanceRevenue.toFixed(2)}
                   </Text>
                 </CardLeft>
 
@@ -1298,8 +1279,7 @@ export default function Dashboard() {
                     Despesas
                   </Text>
                   <Text fontSize="1.5rem">
-                    {/* {formatCurrency(totalBalanceExpense.toString())} */}
-                    R$ {totalBalanceExpense}
+                    R$ {totalBalanceExpense.toFixed(2)}
                   </Text>
                 </CardLeft>
 

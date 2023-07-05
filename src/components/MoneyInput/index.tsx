@@ -6,12 +6,14 @@ interface NumericPriceInputProps {
   value: any;
   onChange: (value: any) => void;
   price: any;
+  color: string;
 }
 
 const MoneyInput: React.FC<NumericPriceInputProps> = ({
   value,
   onChange,
   price,
+  color,
 }) => {
   const handleValueChange = (values: any) => {
     onChange(values.floatValue);
@@ -27,6 +29,14 @@ const MoneyInput: React.FC<NumericPriceInputProps> = ({
       decimalSeparator=","
       decimalScale={price && 2}
       fixedDecimalScale={price}
+      style={{
+        color,
+        fontSize: "1.5rem",
+        width: "100%",
+        height: "30px",
+        border: "none",
+        outline: 0,
+      }}
     />
   );
 };

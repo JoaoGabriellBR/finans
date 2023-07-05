@@ -49,7 +49,6 @@ import handleLogout from "../../utils/handleLogout";
 import Cookies from "js-cookie";
 import api from "../../api";
 import notification from "../../utils/toast";
-import { formatCurrency } from "../../utils/formatCurrency";
 import MoneyInput from "../../components/MoneyInput";
 
 interface Revenue {
@@ -100,7 +99,6 @@ export default function MyBills() {
   const [balanceNewBill, setBalanceNewBill] = useState<string>("");
 
   const [descriptionNewBill, setDescriptionNewBill] = useState<string>("");
-  const [totalBalanceBill, setTotalBalanceBill] = useState<number>(0);
 
   const loadData = async () => {
     try {
@@ -232,6 +230,7 @@ export default function MyBills() {
               value={balanceNewBill}
               onChange={handleChangeBalanceNewBill}
               price
+              color="blue"
             />
 
             <Input
@@ -268,6 +267,7 @@ export default function MyBills() {
               value={updateBillData?.balance}
               onChange={handleChangeBalanceEditBill}
               price={updateBillData?.balance}
+              color="blue"
             />
 
             <Input
@@ -427,7 +427,7 @@ export default function MyBills() {
                 <Box className="div-saldo-atual" mb="1rem">
                   <Text fontSize="0.9rem">Saldo total</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
-                    R$ {bill?.balance}
+                    R$ {bill?.balance.toFixed(2)}
                   </Text>
                 </Box>
 
@@ -438,7 +438,7 @@ export default function MyBills() {
                     color={bill?.billTotal < 0 ? "red" : "green"}
                     fontSize="0.9rem"
                   >
-                    R$ {bill?.billTotal}
+                    R$ {bill?.billTotal.toFixed(2)}
                   </Text>
                 </Box>
 
@@ -446,7 +446,11 @@ export default function MyBills() {
                   <Text fontSize="0.9rem">Total de despesas</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
                     {bill?.expenses?.length}{" "}
-                    {bill?.expenses?.length > 1 ? "despesas" : "despesa"}
+                    {bill?.expenses?.length > 1
+                      ? "despesas"
+                      : !bill?.expenses?.length
+                      ? "despesas"
+                      : "despesa"}
                   </Text>
                 </Box>
 
@@ -454,7 +458,11 @@ export default function MyBills() {
                   <Text fontSize="0.9rem">Total de receitas</Text>
                   <Text as="b" color="green" fontSize="0.9rem">
                     {bill?.revenues?.length}{" "}
-                    {bill?.revenues?.length > 1 ? "receitas" : "receita"}
+                    {bill?.revenues?.length > 1
+                      ? "receitas"
+                      : !bill?.revenues?.length
+                      ? "receitas"
+                      : "receita"}
                   </Text>
                 </Box>
               </CardContas>
