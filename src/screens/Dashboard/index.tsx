@@ -536,11 +536,11 @@ export default function Dashboard() {
           <ModalHeader>Nova Despesa</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <MoneyInput
+            {/* <MoneyInput
               value={balanceNewExpense}
               onChange={handleChangeBalanceNewExpense}
               color="red"
-            />
+            /> */}
 
             <Input
               mt="1.5rem"
@@ -662,14 +662,14 @@ export default function Dashboard() {
           <ModalHeader>Editar Despesa</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <MoneyInput
+            {/* <MoneyInput
               value={(Number(updateExpenseData?.balance)).toString()}
               onChange={(value) => {
                 const formattedValue = Number(value) / 100;
                 handleChangeBalanceEditExpense(formattedValue.toString());
               }}
               color="red"
-            />
+            /> */}
 
             <Input
               mt="1.5rem"
@@ -778,11 +778,11 @@ export default function Dashboard() {
           <ModalHeader>Nova Receita</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <MoneyInput
+            {/* <MoneyInput
               value={balanceNewRevenue}
               onChange={handleChangeBalanceNewRevenue}
               color="green"
-            />
+            /> */}
 
             <Input
               mt="1.5rem"
@@ -910,14 +910,14 @@ export default function Dashboard() {
           <ModalHeader>Editar Receita</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <MoneyInput
+            {/* <MoneyInput
               value={(Number(updateRevenueData?.balance) * 100).toString()}
               onChange={(value) => {
                 const formattedValue = Number(value) / 100;
                 handleChangeBalanceEditRevenue(formattedValue.toString());
               }}
               color="green"
-            />
+            /> */}
 
             <Input
               mt="1.5rem"

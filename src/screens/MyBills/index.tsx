@@ -151,12 +151,18 @@ export default function MyBills() {
   //   setTotalBalanceBill(totalBalanceBill);
   // };
 
-  const handleChangeBalanceNewBill = (value: string) => {
-    const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue);
-    const stringValue = floatValue.toString();
-    setBalanceNewBill(stringValue);
-  };
+  // const handleChangeBalanceNewBill = (value: string) => {
+  //   const rawValue = value.replace(/[^\d]/g, "");
+  //   const floatValue = parseFloat(rawValue);
+  //   const stringValue = floatValue.toString();
+  //   setBalanceNewBill(stringValue);
+  // };
+
+  const handleChangeBalanceNewBill = (value: any) => {
+    setBalanceNewBill(value);
+    console.log(value)
+    // console.log("Valor do campo de entrada:", balanceNewBill);
+  }
 
   const handleChangeBalanceEditBill = (value: string) => {
     const rawValue = value.replace(/[^\d]/g, "");
@@ -263,10 +269,16 @@ export default function MyBills() {
           <ModalHeader>Nova Conta</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <MoneyInput
+            {/* <MoneyInput
               value={balanceNewBill}
               onChange={handleChangeBalanceNewBill}
               color="blue"
+            /> */}
+
+            <MoneyInput
+              value={balanceNewBill}
+              onChange={handleChangeBalanceNewBill}
+              price
             />
 
             <Input
@@ -299,14 +311,14 @@ export default function MyBills() {
           <ModalHeader>Editar Conta </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <MoneyInput
+            {/* <MoneyInput
               value={(Number(updateBillData?.balance)).toString()}
               onChange={(value) => {
                 const formattedValue = Number(value) / 100;
                 handleChangeBalanceEditBill(formattedValue.toString());
               }}
               color="blue"
-            />
+            /> */}
 
             <Input
               mt="1.5rem"

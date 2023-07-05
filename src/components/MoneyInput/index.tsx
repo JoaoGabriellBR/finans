@@ -1,44 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { StyledInput } from "./styles";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
+import { NumericFormat } from "react-number-format";
 
-interface MoneyInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  color: string;
+interface NumericPriceInputProps {
+  value: any;
+  onChange: (value: any) => void;
+  price: any;
 }
 
-const MoneyInput: React.FC<MoneyInputProps> = ({ value, onChange, color }) => {
-  const formatCurrency = (value: string) => {
-    const number = Number(value) / 100;
-    const formattedValue = number.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-    });
-    return formattedValue;
-  };
-
-  const [formattedValue, setFormattedValue] = useState(formatCurrency(value));
-
-  useEffect(() => {
-    const rawValue = formattedValue.replace(/[^\d]/g, "");
-    onChange(rawValue);
-  }, [formattedValue, onChange]);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    const rawValue = inputValue.replace(/[^\d]/g, "");
-    const formattedValue = formatCurrency(rawValue);
-    setFormattedValue(formattedValue);
+const MoneyInput: React.FC<NumericPriceInputProps> = ({
+  value,
+  onChange,
+  price,
+}) => {
+  const handleValueChange = (values: any) => {
+    onChange(values.floatValue);
   };
 
   return (
-    <StyledInput
-      type="text"
-      value={formattedValue}
-      onChange={handleChange}
+    <NumericFormat
+      value={value}
+      onValueChange={handleValueChange}
+      prefix={price && "R$ "}
+      thousandSeparator="."
       placeholder="R$ 0,00"
-      color={color}
+      decimalSeparator=","
+      decimalScale={price && 2}
+      fixedDecimalScale={price}
     />
   );
 };
