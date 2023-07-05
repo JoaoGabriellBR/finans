@@ -123,52 +123,12 @@ export default function MyBills() {
     loadData();
   }, []);
 
-  // const calculateTotalBalances = () => {
-  //   let totalBalanceBill = 0;
-
-  //   billData.forEach((bill) => {
-  //     if (bill.balance !== undefined) {
-  //       totalBalanceBill += bill.balance;
-
-  //       if (bill.revenues) {
-  //         bill.revenues.forEach((revenue: any) => {
-  //           if (revenue.balance !== undefined && revenue.status === true) {
-  //             totalBalanceBill += revenue.balance;
-  //           }
-  //         });
-  //       }
-
-  //       if (bill.expenses) {
-  //         bill.expenses.forEach((expense: any) => {
-  //           if (expense.balance !== undefined && expense.status === true) {
-  //             totalBalanceBill -= expense.balance;
-  //           }
-  //         });
-  //       }
-  //     }
-  //   });
-
-  //   setTotalBalanceBill(totalBalanceBill);
-  // };
-
-  // const handleChangeBalanceNewBill = (value: string) => {
-  //   const rawValue = value.replace(/[^\d]/g, "");
-  //   const floatValue = parseFloat(rawValue);
-  //   const stringValue = floatValue.toString();
-  //   setBalanceNewBill(stringValue);
-  // };
-
   const handleChangeBalanceNewBill = (value: any) => {
     setBalanceNewBill(value);
-    console.log(value)
-    // console.log("Valor do campo de entrada:", balanceNewBill);
-  }
+  };
 
-  const handleChangeBalanceEditBill = (value: string) => {
-    const rawValue = value.replace(/[^\d]/g, "");
-    const floatValue = parseFloat(rawValue);
-    const stringValue = floatValue.toString();
-    setUpdateBillData({ ...updateBillData, balance: stringValue });
+  const handleChangeBalanceEditBill = (value: any) => {
+    setUpdateBillData({ ...updateBillData, balance: value });
   };
 
   const handleChangeDescriptionNewBill = (e: ChangeEvent<HTMLInputElement>) => {
@@ -206,7 +166,6 @@ export default function MyBills() {
   const handleEditBill = async () => {
     setLoadingEditBill(true);
     try {
-      const formattedBill = (Number(updateBillData?.balance) * 100).toString();
       await api({
         method: "PATCH",
         url: `/bill/update/${billId}`,
@@ -216,7 +175,7 @@ export default function MyBills() {
         },
         data: {
           ...updateBillData,
-          balance: parseFloat(formattedBill),
+          balance: parseFloat(updateBillData?.balance ?? ""),
           description: updateBillData?.description,
         },
       });
@@ -269,12 +228,6 @@ export default function MyBills() {
           <ModalHeader>Nova Conta</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <MoneyInput
-              value={balanceNewBill}
-              onChange={handleChangeBalanceNewBill}
-              color="blue"
-            /> */}
-
             <MoneyInput
               value={balanceNewBill}
               onChange={handleChangeBalanceNewBill}
@@ -311,14 +264,11 @@ export default function MyBills() {
           <ModalHeader>Editar Conta </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            {/* <MoneyInput
-              value={(Number(updateBillData?.balance)).toString()}
-              onChange={(value) => {
-                const formattedValue = Number(value) / 100;
-                handleChangeBalanceEditBill(formattedValue.toString());
-              }}
-              color="blue"
-            /> */}
+            <MoneyInput
+              value={updateBillData?.balance}
+              onChange={handleChangeBalanceEditBill}
+              price={updateBillData?.balance}
+            />
 
             <Input
               mt="1.5rem"
