@@ -56,14 +56,19 @@ Finans é uma plataforma intuitiva que visa simplificar e aprimorar o controle f
 <p align="right">(<a href="#readme-top">Voltar ao topo</a>)</p>
 
 ## Layout mobile
-![Mobile 1](https://github.com/JoaoGabriellBR/reactnotes/assets/88870257/37b3c58f-2468-47bf-8d28-e30e6cb94d73)
+
+<div>
+  <img src="https://github.com/JoaoGabriellBR/finans/assets/88870257/d450ec8a-c75e-47da-aff5-d3765a0e7976" />
+  
+  <img src="https://github.com/JoaoGabriellBR/finans/assets/88870257/9943ccda-3711-4e85-94b8-d9c2fd366b47" />
+</div>
+
 
 
 ## Layout web
-![Web 1](https://github.com/JoaoGabriellBR/reactnotes/assets/88870257/ee053d08-c1da-4dcc-9eed-83db3176b2c7)
+![web1](https://github.com/JoaoGabriellBR/finans/assets/88870257/84787db1-dd7f-4659-ab3b-8e9ebc9273f5)
 
-
-![Web 2](https://user-images.githubusercontent.com/88870257/236104148-ab64bcaa-c171-4f4c-b25e-4a2620273332.png)
+![web2](https://github.com/JoaoGabriellBR/finans/assets/88870257/3b373fd3-75cb-40f2-aa3d-bf1690a832bc)
 
 
 <br>
