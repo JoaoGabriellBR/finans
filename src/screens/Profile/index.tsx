@@ -270,7 +270,9 @@ export default function Profile() {
           </div>
 
           <div className="div-alterar-senha">
-            <Text fontSize="1.5em">Alterar Senha</Text>
+            <Text fontSize="1.5em">
+              {loadingChangePassword ? "Alterando senha..." : "Alterar senha"}
+            </Text>
             <div className="div-form">
               <FormControl mb="1.5rem" isRequired>
                 <FormLabel>Senha atual:</FormLabel>

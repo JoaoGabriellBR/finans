@@ -735,7 +735,7 @@ export default function Dashboard() {
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ {updateExpenseData?.balance}
+                  R$ {Number(updateExpenseData?.balance).toFixed(2)}
                 </Text>
               </Box>
             </DivDelete>
@@ -982,7 +982,7 @@ export default function Dashboard() {
               <Box>
                 <Text fontSize="1rem">Valor</Text>
                 <Text color="gray" fontSize="1rem">
-                  R$ {updateRevenueData?.balance}
+                  R$ {Number(updateRevenueData?.balance).toFixed(2)}
                 </Text>
               </Box>
             </DivDelete>
