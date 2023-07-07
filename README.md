@@ -39,7 +39,6 @@
       </ul>
     </li>
     <li><a href="#contato">Contato</a></li>
-    <li><a href="#agradecimentos">Agradecimentos</a></li>
   </ol>
 </details>
 
@@ -130,7 +129,7 @@ O <a href="https://yarnpkg.com/">Yarn</a>  e o <a href="https://www.npmjs.com/">
 1. Configure a sua [API FINANS](https://github.com/JoaoGabriellBR/apifinans)
 2. Clone o repositório
    ```sh
-   git clone https://github.com/JoaoGabriellBR/apifinans.git
+   git clone https://github.com/JoaoGabriellBR/finans.git
    ```
 3. Utilize o pacote NPM ou YARN
    ```sh
