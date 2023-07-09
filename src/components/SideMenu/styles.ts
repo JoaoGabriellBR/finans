@@ -17,8 +17,8 @@ export const LeftBox = styled.div`
   }
 
   .logo {
-    width: 7.5rem;
-    height: 2rem;
+    width: 7.6rem;
+    height: 2.4rem;
     cursor: pointer;
     padding: 0;
     margin-left: 2rem;

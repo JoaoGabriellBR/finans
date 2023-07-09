@@ -15,14 +15,24 @@ import { AiOutlineUser, AiFillBank } from "react-icons/ai";
 import { RxExit, RxDashboard } from "react-icons/rx";
 import logo from "../../assets/logo.png";
 import handleLogout from "../../utils/handleLogout";
+import Cookies from "js-cookie";
 
 export default function SideMenu() {
   const navigate = useNavigate();
   const [isMobile] = useMediaQuery("(max-width: 1024px)");
+  const isAuthenticated = () => !!Cookies.get("finans-authtoken");
 
   return (
     <LeftBox>
-      <img className="logo" alt="logo" src={logo} loading="lazy" />
+      <img
+        onClick={() =>
+          isAuthenticated() ? navigate("/dashboard") : navigate("/")
+        }
+        className="logo"
+        alt="logo"
+        src={logo}
+        loading="lazy"
+      />
 
       {!isMobile && (
         <>
