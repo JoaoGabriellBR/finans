@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  overflow: hidden;
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -18,7 +17,6 @@ export const Section = styled.section`
   width: 100%;
   height: 100%;
   background-color: #eee;
-
   display: flex;
   flex-direction: row;
   justify-content: space-between;
