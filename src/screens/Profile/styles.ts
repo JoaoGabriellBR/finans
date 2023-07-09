@@ -22,8 +22,8 @@ export const Header = styled.div`
   align-items: center;
 
   .logo {
-    width: 7.5rem;
-    height: 2rem;
+    width: 7.6rem;
+    height: 2.4rem;
     cursor: pointer;
     padding: 0;
     margin: 0;

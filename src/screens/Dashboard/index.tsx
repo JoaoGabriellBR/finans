@@ -1133,7 +1133,6 @@ export default function Dashboard() {
       {renderPayExpense()}
       {renderEditExpense()}
       {renderDeleteExpense()}
-
       {renderNewRevenue()}
       {renderReceiveRevenue()}
       {renderEditRevenue()}

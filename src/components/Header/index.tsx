@@ -2,14 +2,16 @@ import { Cabecalho } from "./styles";
 import { Button, ButtonGroup } from "@chakra-ui/react";
 import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export default function Header() {
   const navigate = useNavigate();
+  const isAuthenticated = () => !!Cookies.get("finans-authtoken");
 
   return (
     <Cabecalho>
       <img
-        onClick={() => navigate("/")}
+        onClick={() => isAuthenticated() ? navigate("/dashboard") : navigate("/")}
         className="logo"
         alt="logo"
         src={logo}

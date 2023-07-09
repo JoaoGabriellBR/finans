@@ -42,6 +42,7 @@ type UserData = {
 };
 
 export default function Profile() {
+  const isAuthenticated = () => !!Cookies.get("finans-authtoken");
   const navigate = useNavigate();
   const previousPage = -1;
 
@@ -159,7 +160,7 @@ export default function Profile() {
       <Container>
         <Header>
           <img
-            onClick={() => navigate("/")}
+            onClick={() => isAuthenticated() ? navigate("/dashboard") : navigate("/")}
             className="logo"
             alt="logo"
             src={logo}
