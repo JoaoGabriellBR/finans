@@ -30,7 +30,7 @@ const AuthenticatedRoute = ({
   }, [navigate]);
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return <h1 style={{ display: 'flex', flexDirection: "row", justifyContent: "center", paddingTop: "3rem" }}>Carregando...</h1>;
   }
 
   return <Component {...props} />;
