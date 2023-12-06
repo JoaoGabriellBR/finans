@@ -5,21 +5,10 @@
   <a href="https://github.com/JoaoGabriellBR/reactnotes/assets/88870257/2de7e75e-619b-40d3-ad59-47b145e7ee73">
     <img src="https://github.com/JoaoGabriellBR/reactnotes/assets/88870257/2de7e75e-619b-40d3-ad59-47b145e7ee73" alt="Logo" width="350" height="120">
   </a>
-
-  <h1 align="start">Finans | Finanças Pessoais</h1>
-
-  <p align="start">
-    Organize suas economias de maneira consciente!
-    <br />
-    <a href="https://github.com/JoaoGabriellBR/finans"><strong>Explore a documentação »</strong></a>
-    <br />
-    <br />
-    <a href="https://siteappfinans.netlify.app">Site oficial</a>
-  </p>
 </div>
 
 <!-- TABLE OF CONTENTS -->
-<br><br>
+
 <details>
   <summary>Índice</summary>
   <ol>
@@ -51,7 +40,9 @@
 <hr> 
 Finans é uma plataforma intuitiva que visa simplificar e aprimorar o controle financeiro pessoal, permitindo que você mantenha suas finanças em dia e tome decisões mais coerentes. acompanhando suas receitas, despesas e contas de forma eficiente.
 
-<br> <br>
+<br><br>
+[![Website][Website]][Website-url]
+
 <p align="right">(<a href="#readme-top">Voltar ao topo</a>)</p>
 
 ## Layout mobile
@@ -157,27 +148,25 @@ _Para mais informações sobre o back end da aplicação, por favor verifique a 
 
 <p align="right">(<a href="#readme-top">Voltar ao topo</a>)</p>
 
-
-<!-- CONTACT -->
-## <h2 id="contato">📧 Contato</h2>
-
-Link do projeto: [https://siteappfinans.netlify.app](https://siteappfinans.netlify.app)
-
 <br>
 
-[![Email][Email]][Email-url]
-[![GitHub][GitHub]][GitHub-url]
+## 🔗 Links
+
+[![Porfolio][Porfolio]][Porfolio-url]
 [![Linkedin][Linkedin]][Linkedin-url]
+[![Email][Email]][Email-url]
 
 <p align="right">(<a href="#readme-top">Voltar ao topo</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[Email]: https://img.shields.io/badge/-gmail-black.svg?style=for-the-badge&logo=gmail&colorB=555
+[Website]: https://img.shields.io/badge/site%20oficial-000000?style=for-the-badge
+[Website-url]: https://siteappfinans.netlify.app
+
+[Email]: https://img.shields.io/badge/-gmail-white.svg?style=for-the-badge&logo=gmail
 [Email-url]: joaoname9@gmail.com
 
-[GitHub]: https://img.shields.io/badge/GitHub-0769AD?style=for-the-badge&logo=github&logoColor=white
-[GitHub-url]: https://github.com/JoaoGabriellBR
+[Porfolio]: https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white
+[Porfolio-url]: https://joaogabrielsilva.vercel.app
 
-[Linkedin]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[Linkedin]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=blue
 [Linkedin-url]: https://www.linkedin.com/in/joaogabriel-silva
-
